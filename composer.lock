@@ -1,0 +1,198 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "f6422412030a97bbcc0d39d198d016af",
+    "content-hash": "df6d9c64eda9953aefe127aaecbc8090",
+    "packages": [
+        {
+            "name": "phplegends/collections",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phplegends/collections.git",
+                "reference": "8c6d0024e06fcde3f416533ea8aa729e0d13e773"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phplegends/collections/zipball/8c6d0024e06fcde3f416533ea8aa729e0d13e773",
+                "reference": "8c6d0024e06fcde3f416533ea8aa729e0d13e773",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "victorjonsson/markdowndocs": "1.2.*"
+            },
+            "type": "collection",
+            "autoload": {
+                "psr-4": {
+                    "PHPLegends\\Collections\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wallace de Souza Vizerra",
+                    "email": "wallacemaxters@gmail.com"
+                }
+            ],
+            "time": "2016-05-05 17:08:28"
+        },
+        {
+            "name": "phplegends/routes",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phplegends/routes.git",
+                "reference": "7bf581f302168e50a514a246c4ed810edb7f197e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phplegends/routes/zipball/7bf581f302168e50a514a246c4ed810edb7f197e",
+                "reference": "7bf581f302168e50a514a246c4ed810edb7f197e",
+                "shasum": ""
+            },
+            "require": {
+                "phplegends/collections": "1.*"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "PHPLegends\\Routes\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wallace de Souza",
+                    "email": "wallacemaxters@gmail.com"
+                }
+            ],
+            "description": "A package for work with routes in php",
+            "keywords": [
+                "router",
+                "routes",
+                "routing"
+            ],
+            "time": "2016-05-06 16:47:29"
+        },
+        {
+            "name": "phplegends/view",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phplegends/view.git",
+                "reference": "cd028a0b940abd5d7b2769c9dd69db644a34b7ab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phplegends/view/zipball/cd028a0b940abd5d7b2769c9dd69db644a34b7ab",
+                "reference": "cd028a0b940abd5d7b2769c9dd69db644a34b7ab",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "pimple/pimple": "~3.0"
+            },
+            "require-dev": {
+                "phplegends/collections": "1.*",
+                "victorjonsson/markdowndocs": "1.2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPLegends\\View\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wallace de Souza Vizerra",
+                    "email": "wallacemaxters@gmail.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Guilherme Nascimento",
+                    "email": "guilherme@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Simple Template/Views for php",
+            "keywords": [
+                "template",
+                "view"
+            ],
+            "time": "2016-05-06 16:51:44"
+        },
+        {
+            "name": "pimple/pimple",
+            "version": "v3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silexphp/Pimple.git",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Pimple": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Pimple, a simple Dependency Injection Container",
+            "homepage": "http://pimple.sensiolabs.org",
+            "keywords": [
+                "container",
+                "dependency injection"
+            ],
+            "time": "2015-09-11 15:10:35"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "phplegends/view": 20,
+        "phplegends/routes": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

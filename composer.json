@@ -1,0 +1,23 @@
+{
+    "name": "phplegends/maxters",
+    "description": "A simple microframework for php",
+    "type": "framework",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wallace de Souza Vizerra",
+            "email": "wallacemaxters@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "phplegends/view" : "dev-master",
+        "phplegends/routes" : "dev-master"
+    },
+    "autoload" : {
+
+        "psr-4" : {
+            "Maxters\\" :  "app"
+        }
+    }
+}

@@ -8,6 +8,4 @@ class Home extends Controller
 	{
 		return $this->render('home/index', ['framework' => 'Maxters']);
 	}
-
-	
 }

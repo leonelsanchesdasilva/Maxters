@@ -11,13 +11,12 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "phplegends/view" : "dev-master",
-        "phplegends/routes" : "dev-master"
+        "phplegends/routes": "dev-master",
+        "phplegends/legendary": "dev-master"
     },
     "autoload" : {
-
         "psr-4" : {
-            "Maxters\\" :  "app"
+            "Maxters\\": "app"
         }
     }
 }

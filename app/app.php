@@ -13,3 +13,8 @@ $router->addFilter('check.query.error', function ($route, $app)
 $router->get('/', 'Maxters\Controllers\Home::index')->setFilters(['check.query.error']);
 
 $router->get('/json', 'Maxters\Controllers\Home::jsonExample');
+
+$router->get('/closure', function ()
+{
+	print_r($this);
+});

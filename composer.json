@@ -12,7 +12,8 @@
     "minimum-stability": "stable",
     "require": {
         "phplegends/view" : "dev-master",
-        "phplegends/routes" : "dev-master"
+        "phplegends/routes" : "dev-master",
+        "phplegends/http" : "dev-master"
     },
     "autoload" : {
 

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f6422412030a97bbcc0d39d198d016af",
-    "content-hash": "df6d9c64eda9953aefe127aaecbc8090",
+    "hash": "65d35a59e55933284b1dd4512b5c9bdb",
+    "content-hash": "7d718f67443334a63d6059d65d2b5e6a",
     "packages": [
         {
             "name": "phplegends/collections",
@@ -46,17 +46,56 @@
             "time": "2016-05-05 17:08:28"
         },
         {
+            "name": "phplegends/http",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phplegends/http.git",
+                "reference": "1c22cc6909bdc60a9daa70ef058603dd818efe42"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phplegends/http/zipball/1c22cc6909bdc60a9daa70ef058603dd818efe42",
+                "reference": "1c22cc6909bdc60a9daa70ef058603dd818efe42",
+                "shasum": ""
+            },
+            "require": {
+                "psr/http-message": "1.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "PHPLegends\\Http\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wallace de Souza Vizerra",
+                    "email": "wallacemaxters@gmail.com"
+                }
+            ],
+            "description": "A PHP package for HTTP",
+            "time": "2016-05-17 14:55:47"
+        },
+        {
             "name": "phplegends/routes",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phplegends/routes.git",
-                "reference": "7bf581f302168e50a514a246c4ed810edb7f197e"
+                "reference": "86dc4abfdfa76a27e0cee59409540fedb9f22506"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phplegends/routes/zipball/7bf581f302168e50a514a246c4ed810edb7f197e",
-                "reference": "7bf581f302168e50a514a246c4ed810edb7f197e",
+                "url": "https://api.github.com/repos/phplegends/routes/zipball/86dc4abfdfa76a27e0cee59409540fedb9f22506",
+                "reference": "86dc4abfdfa76a27e0cee59409540fedb9f22506",
                 "shasum": ""
             },
             "require": {
@@ -84,7 +123,7 @@
                 "routes",
                 "routing"
             ],
-            "time": "2016-05-06 16:47:29"
+            "time": "2016-05-20 16:51:57"
         },
         {
             "name": "phplegends/view",
@@ -182,6 +221,55 @@
                 "dependency injection"
             ],
             "time": "2015-09-11 15:10:35"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
+                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2015-05-04 20:22:00"
         }
     ],
     "packages-dev": [],
@@ -189,7 +277,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "phplegends/view": 20,
-        "phplegends/routes": 20
+        "phplegends/routes": 20,
+        "phplegends/http": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

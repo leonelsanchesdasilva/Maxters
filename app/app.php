@@ -1,17 +1,13 @@
 <?php
 
-$router->get('/', 'Maxters\Controllers\Home::index');
-
-$router->get('info/{str?}', function ($info = null) use($router)
+$router->addFilter('check.query.error', function ($route, $app)
 {
-	if ($info === null) {
+	// Adicione "error" na query string da url para testar
 
-		$data = sprintf('PHP version is %f', PHP_VERSION);
-
-	} elseif ($info == 'router') {
-
-		$data = sprintf('The router class name is "%s"', get_class($router));
-	} 
-
-	return $data;
+	if (isset($app['request']->getQueryParams()['error']))
+	{
+		return new PHPLegends\Http\JsonResponse(['Invalid parameter'], 400);
+	}
 });
+
+$router->get('/', 'Maxters\Controllers\Home::index')->setFilters(['check.query.error']);

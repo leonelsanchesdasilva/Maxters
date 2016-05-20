@@ -18,12 +18,8 @@ class Home extends Controller
 		return $this->render('home/index', $data);
 	}	
 
-	public function example()
+	public function jsonExample()
 	{
-		$_get = $this->request('query');
-
-		$_post = $this->request();
-
-
+		return $this->json(['name' => 'Maxters Framework']);
 	}
 }

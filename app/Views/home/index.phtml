@@ -1,1 +1,7 @@
 <?php $this->extend('layout') ?>
+
+<?php $this->section('content') ?>
+<li>Você está acessando a view <strong><?= $this->getName() ?></strong></li>
+<li>Você está usando o PHP <?= PHP_VERSION ?></li>
+<li>A sessão está <?= session_id() ? 'ativada' : 'desativada' ?>
+<?php $this->endSection() ?>

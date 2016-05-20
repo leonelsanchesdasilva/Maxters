@@ -3,6 +3,7 @@
 namespace Maxters\Controllers;
 
 use PHPLegends\View\View;
+use PHPLegends\Http\JsonResponse;
 use PHPLegends\Http\ServerRequest;
 
 abstract class Controller
@@ -29,5 +30,13 @@ abstract class Controller
 	protected function render($name, $data)
 	{
 		return $this->app['view']($name, $data);
+	}
+
+	protected function json($data, $code = 200, $flag = 0)
+	{		
+
+		$this->app['debug'] == false ?: $flag = 128;
+
+		return new JsonResponse($data, $code, $flag);
 	}
 }

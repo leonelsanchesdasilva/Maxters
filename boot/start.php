@@ -10,6 +10,8 @@ include_once ROOT_PATH . '/vendor/autoload.php';
 
 $app = new Maxters\Container;
 
+// Define container Classes
+
 $app->singleton('app', $app);
 
 $app->singleton('router', $router = new \PHPLegends\Routes\Router);
@@ -22,6 +24,8 @@ $app['view'] = function ($name, $data) {
 };
 
 $app->singleton('request', PHPLegends\Http\ServerRequest::createFromGlobals());
+
+$app['debug'] = true;
 
 call_user_func(function () use ($app, $router)
 {

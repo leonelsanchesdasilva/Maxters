@@ -9,7 +9,9 @@ namespace Maxters;
  * */
 class Container implements \ArrayAccess
 {
-	protected $container;
+	protected $container = [
+		'debug' => false,
+	];
 
 	public function offsetGet($key)
 	{

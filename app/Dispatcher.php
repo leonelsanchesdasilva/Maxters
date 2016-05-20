@@ -67,7 +67,7 @@ class Dispatcher implements Dispatchable
 
 		} else {
 
-			$action->bindTo($this->app);
+			$action = $action->bindTo($this->app);
 		}
 
 		$response = call_user_func_array(

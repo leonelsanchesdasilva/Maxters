@@ -5,11 +5,27 @@ namespace Maxters;
 use PHPLegends\Routes\Dispatchable;
 use PHPLegends\Routes\Router;
 use PHPLegends\Http\ServerRequest;
+use PHPLegends\Routes\Collection;
+use PHPLegends\Http\Exceptions\HttpException;
 
+/**
+ * Dispatcher for Maxters Framework application
+ * This dispatcher is costume of this framework and implement Dispatchable for PHPLegends\Route packages
+ * @author Wallace de Souza Vizerra <wallacemaxters@gmail.com>
+ * 
+ * */
 class Dispatcher implements Dispatchable
 {
+	
+	/**
+	 * @var \Maxters\Container
+	 * */
 	protected $app;
 
+	/**
+	 * 
+	 * @param \Maxters\Container $app
+	 * */
 	public function __construct(\Maxters\Container $app)
 	{
 		$this->app = $app;
@@ -21,32 +37,19 @@ class Dispatcher implements Dispatchable
 
 		$uri = $request->getUri()->getPath();
 
+		$routes = $this->filterRoutesByRequest($request, $router->getCollection());
+
 		$method = $request->getMethod();
-
-		// Filter retorna um ou mais candidatos
-
-		$routes = $router->getCollection()->filterByUri($uri);
-
-		if ($routes->isEmpty()) {
-
-			// @TODO criar a classe HttpException no PHPLegends\Http
-
-			throw new \RunTimeException("Route '{$uri}' not found");
-		}
-
-		// "Find" retorna um ou NULL
 
 		$route = $routes->findByVerb($method);
 
 		if ($route === null) {
 
-			// @TODO lancar um http Exception com "405", método não aceito
+			$message = sprintf(
+				'Method "%s" is not allowed for "%s" route', $method, $uri
+			);
 
-			throw new \RuntTimeException(sprintf(
-				'Method "%s" is not allowed for "%s" route',
-				$method,
-				$uri
-			));
+			throw $this->getHttpException($message, 405);
 		}
 
 		$resultFilter = $router->getFilters()
@@ -57,22 +60,9 @@ class Dispatcher implements Dispatchable
 			return $this->processFilterResult($resultFilter);
 		}
 
-		$routeArgs = $route->match($uri);
+		$action = $this->resolveRouteAction($route);
 
-		$action = $route->getAction();
-
-		if (is_array($action)) {
-			
-			$action = $this->resolverControllerInstance($action[0], $action[1]);
-
-		} else {
-
-			$action = $action->bindTo($this->app);
-		}
-
-		$response = call_user_func_array(
-			$action, $routeArgs
-		);
+		$response = call_user_func_array($action, $route->match($uri));
 
 		return $this->processRouteResponse($response);
 
@@ -89,11 +79,6 @@ class Dispatcher implements Dispatchable
 
 	protected function processFilterResult($resultFilter)
 	{
-		if ($resultFilter instanceof \Exception)
-		{
-			throw $resultFilter;
-		}
-
 		if ($resultFilter instanceof \PHPLegends\Http\Response)
 		{
 			return $resultFilter->send();
@@ -101,10 +86,10 @@ class Dispatcher implements Dispatchable
 
 		if (is_string($resultFilter))
 		{
-			throw new \Exception($resultFilter);
+			return new \PHPLegends\Http\Response($resultFilter);
 		}
 
-		throw new \Exception('Unprocessable filter value');
+		//throw new \Exception('Unprocessable filter value');
 	}
 
 	protected function processRouteResponse($response)
@@ -148,5 +133,40 @@ class Dispatcher implements Dispatchable
 		return is_scalar($candidate) || $candidate instanceof \PHPLegends\View\View;
 	}
 
+	protected function filterRoutesByRequest(ServerRequest $request, Collection $routes)
+	{
+
+		$uri = $request->getUri()->getPath();
+
+		$routes = $routes->filterByUri($uri);
+
+		if ($routes->isEmpty()) {
+
+			throw new HttpException("Route '{$uri}' not found", 404);
+		}
+
+		return $routes;
+	}
+
+	protected function resolveRouteAction($route)
+	{
+		$action = $route->getAction();
+
+		if (is_array($action)) {
+			
+			$action = $this->resolverControllerInstance($action[0], $action[1]);
+
+		} else {
+
+			$action = $action->bindTo($this->app);
+		}
+
+		return $action;
+	}
+
+	protected function getHttpException($message, $statusCode = 500)
+	{		
+		return new HttpException($message, $statusCode);
+	}
 	
 }

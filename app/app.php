@@ -16,5 +16,6 @@ $router->get('/json', 'Maxters\Controllers\Home::jsonExample');
 
 $router->get('/closure', function ()
 {
+
 	print_r($this);
 });

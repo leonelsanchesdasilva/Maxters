@@ -12,8 +12,6 @@ $app = new Maxters\Container;
 
 // Define container Classes
 
-$app->singleton('app', $app);
-
 $app->singleton('router', $router = new \PHPLegends\Routes\Router);
 
 $app['view'] = function ($name, $data) {
@@ -27,8 +25,18 @@ $app->singleton('request', PHPLegends\Http\ServerRequest::createFromGlobals());
 
 $app['debug'] = true;
 
-call_user_func(function () use ($app, $router)
+
+$app['response'] = function ($message, $code, array $headers = [])
 {
+	return new PHPLegends\Http\Response($message, $code, $headers);
+};
+
+$app['response.view'] = function ($name, array $data = [], $code = 200, array $headers = []) use($app)
+{
+	return $app['response']($app['view']($name, $data)->render(), $code, $headers);
+};
+
+call_user_func(function () use ($app, $router) {
 	include_once APP_PATH . '/app.php';
 });
 

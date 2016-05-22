@@ -13,6 +13,9 @@ class Container implements \ArrayAccess
 		'debug' => false,
 	];
 
+	/**
+	 * 
+	 * */
 	public function offsetGet($key)
 	{
 		if (! isset($this->container[$key]))

@@ -68,6 +68,12 @@ class Dispatcher implements Dispatchable
 
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param string $class
+	 * @param string $method
+	 * */
 	protected function resolverControllerInstance($class, $method)
 	{
 		$controller = new $class;
@@ -77,6 +83,12 @@ class Dispatcher implements Dispatchable
 		return [$controller, $method];
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param string $resultFilter
+	 * @return 
+	 * */
 	protected function processFilterResult($resultFilter)
 	{
 		if ($resultFilter instanceof \PHPLegends\Http\Response)
@@ -86,7 +98,7 @@ class Dispatcher implements Dispatchable
 
 		if (is_string($resultFilter))
 		{
-			return new \PHPLegends\Http\Response($resultFilter);
+			return $this->app['response']($resultFilter)->send();
 		}
 
 		//throw new \Exception('Unprocessable filter value');
@@ -97,11 +109,9 @@ class Dispatcher implements Dispatchable
 
 		if ($this->shouldBeResponse($response)) {
 
-			$response = new \PHPLegends\Http\Response($response, 200, [
+			$response = $this->app['response']($response, 200, [
 				'Content-Type' => 'text/html; charset=utf8;'
 			]);
-
-			$response;
 
 		} elseif ($this->shouldBeJsonResponse($response)) {
 
@@ -130,7 +140,7 @@ class Dispatcher implements Dispatchable
 
 	protected function shouldBeResponse($candidate)
 	{
-		return is_scalar($candidate) || $candidate instanceof \PHPLegends\View\View;
+		return is_string($candidate) || $candidate instanceof \PHPLegends\View\View;
 	}
 
 	protected function filterRoutesByRequest(ServerRequest $request, Collection $routes)

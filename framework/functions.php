@@ -2,6 +2,12 @@
 
 namespace Maxters;
 
+/**
+ * 
+ * 
+ * @param ...$args
+ * @return void
+ **/
 function debug()
 {
     foreach (func_get_args() as $value)

@@ -5,12 +5,13 @@ namespace Maxters\Controllers;
 use PHPLegends\View\View;
 use PHPLegends\Http\JsonResponse;
 use PHPLegends\Http\ServerRequest;
+use Pimple\Container as PimpleContainer;
 
-abstract class Controller
+class Controller
 {
 	protected $app;
 
-	public function setApp(\Maxters\Container $app)
+	public function setApp(PimpleContainer $app)
 	{
 		$this->app = $app;
 	}
@@ -27,16 +28,9 @@ abstract class Controller
 		return $request;
 	}
 
-	protected function render($name, $data)
+	public function render($view, $data = [])
 	{
-		return $this->app['view']($name, $data);
+		return $this->app['view']->create($view, $data);
 	}
 
-	protected function json($data, $code = 200, $flag = 0)
-	{		
-
-		$this->app['debug'] == false ?: $flag = 128;
-
-		return new JsonResponse($data, $code, $flag);
-	}
 }

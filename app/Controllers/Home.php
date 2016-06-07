@@ -6,16 +6,7 @@ class Home extends Controller
 {
 	public function index()
 	{	
-		$data['framework'] = 'Maxters';
-
-		$query = $this->app['request']->getQueryParams();
-
-		if (isset($query['framework']))
-		{
-			$data['framework'] = $query['framework'];
-		}
-
-		return $this->render('home/index', $data);
+		return $this->render('home/index', []);
 	}	
 
 	public function jsonExample()

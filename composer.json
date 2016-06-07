@@ -13,12 +13,16 @@
     "require": {
         "phplegends/view" : "dev-master",
         "phplegends/routes" : "dev-master",
-        "phplegends/http" : "dev-master"
+        "phplegends/http" : "dev-master",
+        "pimple/pimple": "^3.0"
     },
     "autoload" : {
 
         "psr-4" : {
             "Maxters\\" :  "app"
-        }
+        },
+        "files" : [
+            "framework/functions.php"
+        ]
     }
 }

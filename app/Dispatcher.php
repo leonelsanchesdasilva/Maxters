@@ -2,15 +2,19 @@
 
 namespace Maxters;
 
-use PHPLegends\Routes\Dispatchable;
 use PHPLegends\Routes\Router;
-use PHPLegends\Http\ServerRequest;
+use PHPLegends\Http\Response;
 use PHPLegends\Routes\Collection;
+use PHPLegends\Http\JsonResponse;
+use PHPLegends\Http\ServerRequest;
+use PHPLegends\Routes\Dispatchable;
+use Pimple\Container as PimpleContainer;
 use PHPLegends\Http\Exceptions\HttpException;
 
 /**
  * Dispatcher for Maxters Framework application
  * This dispatcher is costume of this framework and implement Dispatchable for PHPLegends\Route packages
+ * 
  * @author Wallace de Souza Vizerra <wallacemaxters@gmail.com>
  * 
  * */
@@ -22,11 +26,7 @@ class Dispatcher implements Dispatchable
 	 * */
 	protected $app;
 
-	/**
-	 * 
-	 * @param \Maxters\Container $app
-	 * */
-	public function __construct(\Maxters\Container $app)
+	public function __construct(PimpleContainer $app)
 	{
 		$this->app = $app;
 	}
@@ -98,10 +98,8 @@ class Dispatcher implements Dispatchable
 
 		if (is_string($resultFilter))
 		{
-			return $this->app['response']($resultFilter)->send();
+			return (new Response($resultFilter))->send();
 		}
-
-		//throw new \Exception('Unprocessable filter value');
 	}
 
 	protected function processRouteResponse($response)
@@ -109,15 +107,15 @@ class Dispatcher implements Dispatchable
 
 		if ($this->shouldBeResponse($response)) {
 
-			$response = $this->app['response']($response, 200, [
+			$response = $this->createResponse($response, 200, [
 				'Content-Type' => 'text/html; charset=utf8;'
 			]);
 
 		} elseif ($this->shouldBeJsonResponse($response)) {
 
-			$response = new \PHPLegends\Http\JsonResponse($response, 200, JSON_PRETTY_PRINT);
+			$response = new JsonResponse($response, 200);
 
-		} elseif (! $response instanceof \PHPLegends\Http\Response) {
+		} elseif (! $response instanceof Response) {
 
 			throw new \RunTimeException(
 				sprintf(
@@ -177,6 +175,11 @@ class Dispatcher implements Dispatchable
 	protected function getHttpException($message, $statusCode = 500)
 	{		
 		return new HttpException($message, $statusCode);
+	}
+
+	protected function createResponse($message, $code = 200, array $headers = [])
+	{
+		return new Response($message, $code, $headers);
 	}
 	
 }

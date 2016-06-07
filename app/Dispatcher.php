@@ -2,13 +2,13 @@
 
 namespace Maxters;
 
+use Maxters\Container;
 use PHPLegends\Routes\Router;
 use PHPLegends\Http\Response;
 use PHPLegends\Routes\Collection;
 use PHPLegends\Http\JsonResponse;
 use PHPLegends\Http\ServerRequest;
 use PHPLegends\Routes\Dispatchable;
-use Pimple\Container as PimpleContainer;
 use PHPLegends\Http\Exceptions\HttpException;
 
 /**
@@ -26,7 +26,7 @@ class Dispatcher implements Dispatchable
 	 * */
 	protected $app;
 
-	public function __construct(PimpleContainer $app)
+	public function __construct(Container $app)
 	{
 		$this->app = $app;
 	}

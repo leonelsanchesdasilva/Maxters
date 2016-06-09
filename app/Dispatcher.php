@@ -10,6 +10,7 @@ use PHPLegends\Http\JsonResponse;
 use PHPLegends\Http\ServerRequest;
 use PHPLegends\Routes\Dispatchable;
 use PHPLegends\Http\Exceptions\HttpException;
+use PHPLegends\Http\Exceptions\NotFoundException;
 
 /**
  * Dispatcher for Maxters Framework application
@@ -150,7 +151,7 @@ class Dispatcher implements Dispatchable
 
 		if ($routes->isEmpty()) {
 
-			throw new HttpException("Route '{$uri}' not found", 404);
+			throw new NotFoundException("Route '{$uri}' not found");
 		}
 
 		return $routes;

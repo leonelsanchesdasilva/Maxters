@@ -1,25 +1,31 @@
 <?php
 
-$router->addFilter('check.query.error', function ($route, $app)
-{
-	// Adicione "error" na query string da url para testar
+use PHPLegends\Http\Response;
+use PHPLegends\Http\RedirectResponse;
+use PHPLegends\Http\JsonResponse;
 
-	if (isset($app['request']->getQueryParams()['error'])) {
-		return new PHPLegends\Http\JsonResponse(['Invalid parameter'], 400);
-	}
+$router->get('/', 'Maxters\Controllers\Home::index');
+
+$router->get('/json-example', 'Maxters\Controllers\Home::jsonExample');
+
+/**
+ *
+ * @link http://localhost:8000/test-exception/BadMethodCall
+ * @link http://localhost:8000/test-exception/Length
+ * @link http://localhost:8000/test-exception/Domain
+ * 
+ * */
+
+$router->get('/test-exception/{str}', function ($exception)
+{
+	$class = $exception . 'Exception';
+
+    throw new $class;
 });
 
-$router->get('/', 'Maxters\Controllers\Home::index')
-        ->setFilters(['check.query.error']);
-
-$router->get('/json', 'Maxters\Controllers\Home::jsonExample');
-
-// @TODO Guilherme, dá uma olhada nessa rota
-// Veja que consegui injetar o "this" dentro da closure
-
-$router->get('/closure', function ()
+$router->get('infos', function ()
 {
-	return 'Olá, mundo';
+    return $this['view']->create('infos', ['app' => $this]);
 });
 
 $router->get('/redirect', function () {

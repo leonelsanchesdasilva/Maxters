@@ -11,6 +11,6 @@ class Home extends Controller
 
 	public function jsonExample()
 	{
-		return $this->json(['name' => 'Maxters Framework']);
+		return ['nome' => 'Wallace'];
 	}
 }

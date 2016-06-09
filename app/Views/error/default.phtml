@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Maxters Framework</title>
+<?php $this->extend('error/layout') ?>
 
-	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-</head>
-<body>	
+<?php $this->section('content') ?>
 	<div class="container">
 		<div>
 			<h1 class="page-title"><?= get_class($exception) ?></h1>
@@ -13,5 +8,27 @@
 		<div>
 			<pre><?= $exception ?></pre>
 		</div>
-</body>
-</html>
+        
+        <table class="table">
+            <tr>
+                <th>Arquivo</th>
+                <td><?= $exception->getFile() ?></td>
+            </tr>
+            <tr>
+                <th>Linha</th>
+                <td><?= $exception->getLine() ?></td>
+            </tr>
+            <tr>
+                <th></th>
+                <td></td>
+            </tr>
+        </table>
+        <pre>
+        <?php foreach ($errorLines as $key => $value): ?><!--
+            O pré é chato, tive que fazer essa gambi @Guilherme!
+        --><div><?=$key?></div><!--
+        --><?= htmlentities($value) ?><!--
+        --><?php endforeach ?>
+        </pre>
+    </div>
+<?php $this->endSection() ?>

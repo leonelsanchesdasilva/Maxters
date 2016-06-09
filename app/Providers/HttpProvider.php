@@ -18,5 +18,6 @@ class HttpProvider extends AbstractProvider
         $app['request'] = function ($c) {
             return ServerRequest::createFromGlobals();
         };
+
     }
 }

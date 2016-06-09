@@ -35,6 +35,8 @@ class ViewProvider extends AbstractProvider
             return new Factory($app['view.finder'], $app['view.data']);
         };
 
+        $app['view.data']->define('__app', $app);
+
         $this->sharedData($app['view.data']);
     }
 

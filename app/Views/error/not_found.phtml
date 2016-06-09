@@ -1,0 +1,14 @@
+<?php $this->extend('error/layout') ?>
+
+<?php $this->section('content') ?>
+    <div class="container">
+        <div>
+            <h1 class="page-title">Página não existe</h1>
+        </div>
+        <div>
+            <pre>Essa página não existe</pre>
+            <pre>A rota <strong>"<?= $__app['request']->getUri() ?>"</strong> não foi definida</pre>
+        </div>
+
+    </div>
+<?php $this->endSection() ?>

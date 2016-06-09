@@ -2,6 +2,10 @@
 
 namespace Maxters;
 
+
+// Esse arquivo é carregado pelo composer
+
+
 /**
  * 
  * 

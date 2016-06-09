@@ -5,15 +5,16 @@ set_error_handler(function ($code, $message, $filename, $line, $context = null)
 	throw new ErrorException($message, $code, 0, $filename, $line);
 });
 
-$app = include __DIR__ . '/../boot/start.php';
+$app = include __DIR__ . '/../framework/start.php';
 
-try {
+set_exception_handler(function ($exception) use($app)
+{
+    $handle =new Maxters\Exceptions\Handle($app);
 
-	$dispatcher = new Maxters\Dispatcher($app);
+    return $handle->render($exception);
 
-	$app['router']->dispatch($dispatcher);	
+});
 
-} catch (\Exception $e) {
-	
-	echo $app['view']->create('error/default', ['exception' => $e]);
-}
+$dispatcher = new Maxters\Dispatcher($app);
+
+$app['router']->dispatch($dispatcher);

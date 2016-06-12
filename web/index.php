@@ -9,7 +9,7 @@ $app = include __DIR__ . '/../framework/start.php';
 
 set_exception_handler(function ($exception) use($app)
 {
-    $handle =new Maxters\Exceptions\Handle($app);
+    $handle = new Maxters\Exceptions\Handle($app);
 
     return $handle->render($exception);
 

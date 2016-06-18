@@ -14,8 +14,7 @@
         "phplegends/view" : "dev-master",
         "phplegends/routes" : "dev-master",
         "phplegends/http" : "dev-master",
-        "pimple/pimple": "^3.0",
-        "deployer/deployer": "^3.2"
+        "pimple/pimple": "^3.0"
     },
     "autoload" : {
 

@@ -24,9 +24,8 @@ class ViewProvider extends AbstractProvider
             return new Finder($config['extensions'], $config['default_path']);
         };
 
-        $app['view.data'] = function () {
-            return new Data;
-        };
+        $app['view.data'] = new Data;
+    
 
         $app['view'] = function ($app) {
 

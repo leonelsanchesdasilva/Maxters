@@ -32,3 +32,7 @@ function debug()
 
     exit;
 }
+
+
+// Adicione as suas funções aqui, mas com  moderação. Nada de gambiarras
+

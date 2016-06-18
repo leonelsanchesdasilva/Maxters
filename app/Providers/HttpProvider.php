@@ -3,7 +3,9 @@
 namespace Maxters\Providers;
 
 use Pimple\Container;
-use PHPLegends\Http\ServerRequest;
+use PHPLegends\Http\Request;
+use PHPLegends\Http\CookieJar;
+use PHPLegends\Http\ResponseHeaderCollection;
 
 class HttpProvider extends AbstractProvider
 {
@@ -15,9 +17,18 @@ class HttpProvider extends AbstractProvider
      * */
     public function register(Container $app)
     {
-        $app['request'] = function ($c) {
-            return ServerRequest::createFromGlobals();
-        };
 
+        $app['request'] = Request::createFromGlobals();
+
+        $app['cookies'] = new CookieJar;
+
+        $app['headers'] = function ($app) {
+            
+            $headers = new ResponseHeaderCollection;
+
+            $headers['content-type'] = 'text/html; charset=utf-8;';
+
+            return $headers->setCookies($app['cookies']);
+        };
     }
 }

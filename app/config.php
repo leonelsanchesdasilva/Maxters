@@ -1,9 +1,9 @@
 <?php
 
 return [
-	'debug' => false,
+	'debug' => true,
 	'view'  => [
-		'default_path'      => APP_PATH . '/Views/',
+		'default_path'  => FRAMEWORK_PATH . '/views/',
 		'extensions' => [
             'phtml' => NULL,
             'tpl'   => (unset) 'DefineYourCompile'

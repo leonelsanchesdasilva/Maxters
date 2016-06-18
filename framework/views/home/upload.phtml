@@ -1,0 +1,11 @@
+<?php $this->extend('layout') ?>
+
+<?php $this->section('content') ?>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="files[]" class="form-control" />
+    <input type="file" name="files[]" class="form-control" />
+    <input type="submit" name="Submeter" class="btn btn-primary">
+</form>
+
+<?php $this->endSection() ?>

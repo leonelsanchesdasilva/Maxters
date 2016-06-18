@@ -3,7 +3,6 @@
 namespace Maxters\Providers;
 
 use PHPLegends\Http\Response;
-use Pimple\ServiceProviderInterface;
 use Pimple\Container;
 
 class AppProvider extends AbstractProvider

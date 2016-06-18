@@ -7,7 +7,7 @@ use PHPLegends\Routes\Router;
 use PHPLegends\Http\Response;
 use PHPLegends\Routes\Collection;
 use PHPLegends\Http\JsonResponse;
-use PHPLegends\Http\ServerRequest;
+use PHPLegends\Http\Request;
 use PHPLegends\Routes\Dispatchable;
 use PHPLegends\Http\Exceptions\HttpException;
 use PHPLegends\Http\Exceptions\NotFoundException;
@@ -92,15 +92,20 @@ class Dispatcher implements Dispatchable
 	 * */
 	protected function processFilterResult($resultFilter)
 	{
-		if ($resultFilter instanceof \PHPLegends\Http\Response)
-		{
-			return $resultFilter->send();
-		}
-
+		
 		if (is_string($resultFilter))
 		{
-			return (new Response($resultFilter))->send();
+			$resultFilter = $this->createResponse($resultFilter)->send();
 		}
+
+		// if ($resultFilter instanceof \PHPLegends\Http\Response)
+		// {
+				//throw new 		
+		// }
+
+		$resultFilter->setHeaders($this->app['headers']);
+
+		$resultFilter->send();
 	}
 
 	protected function processRouteResponse($response)
@@ -114,7 +119,7 @@ class Dispatcher implements Dispatchable
 
 		} elseif ($this->shouldBeJsonResponse($response)) {
 
-			$response = new JsonResponse($response, 200);
+			$response = $this->createJsonResponse($response, 200);
 
 		} elseif (! $response instanceof Response) {
 
@@ -126,6 +131,8 @@ class Dispatcher implements Dispatchable
 			);
 		}
 
+		$response->setHeaders($this->app['headers']);
+		
 		$response->send();
 	}
 
@@ -137,12 +144,18 @@ class Dispatcher implements Dispatchable
 				|| $candidate instanceof \stdClass;
 	}
 
+	/**
+	 * Detect if response should be PHPLegends\Http\Response instance
+	 * 
+	 * @param mixed $candidate
+	 * @return boolean
+	 * */
 	protected function shouldBeResponse($candidate)
 	{
 		return is_string($candidate) || $candidate instanceof \PHPLegends\View\View;
 	}
 
-	protected function filterRoutesByRequest(ServerRequest $request, Collection $routes)
+	protected function filterRoutesByRequest(Request $request, Collection $routes)
 	{
 
 		$uri = $request->getUri()->getPath();
@@ -178,9 +191,14 @@ class Dispatcher implements Dispatchable
 		return new HttpException($message, $statusCode);
 	}
 
-	protected function createResponse($message, $code = 200, array $headers = [])
+	protected function createResponse($message, $code = 200)
 	{
-		return new Response($message, $code, $headers);
+		return new Response($message, $code);
+	}
+
+	protected function createJsonResponse($data)
+	{
+		return new JsonResponse($data, 200, $this->app['headers']);
 	}
 	
 }

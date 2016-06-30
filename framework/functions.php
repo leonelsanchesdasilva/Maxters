@@ -7,8 +7,8 @@ namespace Maxters;
 
 
 /**
- * 
- * 
+ *
+ *
  * @param ...$args
  * @return void
  **/
@@ -33,6 +33,29 @@ function debug()
     exit;
 }
 
+/**
+ * Raise a Http Error Exception
+ *
+ * @throws \PHPLegends\Http\Exceptions\HttpException
+ * */
 
-// Adicione as suas funções aqui, mas com  moderação. Nada de gambiarras
+function http_error($message, $statusCode = 500)
+{
 
+    if ($statusCode === 404) {
+
+        throw new \PHPLegends\Http\Exceptions\NotFoundException($message);
+    }
+
+    throw new \PHPLegends\Http\Exceptions\HttpException($message, $statusCode);
+
+}
+
+/**
+ * Raise a Http Error Execption if condition is TRUE
+ *
+ * */
+function http_error_when($condition, $message, $statusCode = 500)
+{
+    $condition && \Maxters\http_error($message, $statusCode);
+}

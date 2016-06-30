@@ -4,12 +4,18 @@
 	<title><?= $framework ?> Framework</title>
 
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <script src="/js/angularjs/angular.min.js"></script>
+
+    <script src="/js/default.js"></script>
+
+    <?= $this->getSection('scripts'); ?>
 </head>
-<body>	
+<body>
 	<div class="container">
 		<div>
 		<h1 class="page-title">Welcome to the <u><?= $framework ?></u> Framework</h1></div>
-		<div><?= $this->getSection('content') ?>
+		<div ng-app="content"><?= $this->getSection('content') ?>
 	</div>
 </body>
 </html>

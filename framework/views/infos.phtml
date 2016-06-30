@@ -1,22 +1,17 @@
 <?php $this->extend('layout') ?>
 
 <?php $this->section('content') ?>
-
-<h4 class='page-title'>Objetos no Maxters\Container</h4>
-<table class="table">
-    <?php foreach ($__app->keys() as $key): ?>
-        <tr>
-            <th><?= $key ?></th>
-            <td style="white-space: pre;"><?= 
-                is_object($__app[$key]) ? 
-                    get_class($__app[$key]) 
-                  : var_export($__app[$key], true) 
-            ?>            
-            </td>
+<div ng-controller="infos">
+    <h4 class='page-title'>Objetos no Maxters\Container</h4>
+    <table class="table">
+        <tr ng-repeat="(key, value) in infos">
+            <th>{{ key }}</th>
+            <td style="white-space: pre;">{{ value }}</td>
         </tr>
-    <?php endforeach ?>
-</table>
+    </table>
+</div>
+<?php $this->endSection() ?>
 
-O debug está <?= $__app['config']['debug'] ? 'habilitado' : 'desabilitado' ;?>
-
+<?php $this->section('scripts') ?>
+<script type="text/javascript" src="/js/infos.js"></script>
 <?php $this->endSection() ?>

@@ -14,15 +14,16 @@
         "phplegends/view" : "dev-master",
         "phplegends/routes" : "dev-master",
         "phplegends/http" : "dev-master",
-        "pimple/pimple": "^3.0"
+        "pimple/pimple": "^3.0",
+        "propel/propel": "~2.0@dev"
     },
     "autoload" : {
-
         "psr-4" : {
             "Maxters\\" :  "app"
         },
         "files" : [
-            "framework/functions.php"
+            "framework/functions.php",
+            "db/generated-conf/config.php"
         ]
     }
 }

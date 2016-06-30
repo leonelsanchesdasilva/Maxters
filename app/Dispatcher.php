@@ -15,190 +15,191 @@ use PHPLegends\Http\Exceptions\NotFoundException;
 /**
  * Dispatcher for Maxters Framework application
  * This dispatcher is costume of this framework and implement Dispatchable for PHPLegends\Route packages
- * 
+ *
  * @author Wallace de Souza Vizerra <wallacemaxters@gmail.com>
- * 
+ *
  * */
 class Dispatcher implements Dispatchable
 {
-	
-	/**
-	 * @var \Maxters\Container
-	 * */
-	protected $app;
 
-	public function __construct(Container $app)
-	{
-		$this->app = $app;
-	}
+    /**
+     * @var \Maxters\Container
+     * */
+    protected $app;
 
-	public function dispatch(Router $router)
-	{
-		$request = $this->app['request'];
+    public function __construct(Container $app)
+    {
+        $this->app = $app;
+    }
 
-		$uri = $request->getUri()->getPath();
+    public function dispatch(Router $router)
+    {
+        $request = $this->app['request'];
 
-		$routes = $this->filterRoutesByRequest($request, $router->getCollection());
+        $uri = $request->getUri()->getPath();
 
-		$method = $request->getMethod();
+        $routes = $this->filterRoutesByRequest($request, $router->getCollection());
 
-		$route = $routes->findByVerb($method);
+        $method = $request->getMethod();
 
-		if ($route === null) {
+        $route = $routes->findByVerb($method);
 
-			$message = sprintf(
-				'Method "%s" is not allowed for "%s" route', $method, $uri
-			);
+        if ($route === null) {
 
-			throw $this->getHttpException($message, 405);
-		}
+            $message = sprintf(
+                'Method "%s" is not allowed for "%s" route', $method, $uri
+            );
 
-		$resultFilter = $router->getFilters()
-								->processRouteFilters($route, $this->app);
+            throw $this->getHttpException($message, 405);
+        }
 
-		if ($resultFilter !== null) {
+        $resultFilter = $router->getFilters()
+                                ->processRouteFilters($route, $this->app);
 
-			return $this->processFilterResult($resultFilter);
-		}
+        if ($resultFilter !== null) {
 
-		$action = $this->resolveRouteAction($route);
+            return $this->processFilterResult($resultFilter);
+        }
 
-		$response = call_user_func_array($action, $route->match($uri));
+        $action = $this->resolveRouteAction($route);
 
-		return $this->processRouteResponse($response);
+        $response = call_user_func_array($action, $route->match($uri));
 
-	}
+        return $this->processRouteResponse($response);
 
-	/**
-	 * 
-	 * 
-	 * @param string $class
-	 * @param string $method
-	 * */
-	protected function resolverControllerInstance($class, $method)
-	{
-		$controller = new $class;
+    }
 
-		$controller->setApp($this->app);
+    /**
+     *
+     *
+     * @param string $class
+     * @param string $method
+     * */
+    protected function resolverControllerInstance($class, $method)
+    {
+        $controller = new $class;
 
-		return [$controller, $method];
-	}
+        $controller->setApp($this->app);
 
-	/**
-	 * 
-	 * 
-	 * @param string $resultFilter
-	 * @return 
-	 * */
-	protected function processFilterResult($resultFilter)
-	{
-		
-		if (is_string($resultFilter))
-		{
-			$resultFilter = $this->createResponse($resultFilter)->send();
-		}
+        return [$controller, $method];
+    }
 
-		// if ($resultFilter instanceof \PHPLegends\Http\Response)
-		// {
-				//throw new 		
-		// }
+    /**
+     *
+     *
+     * @param string $resultFilter
+     * @return void
+     * */
+    protected function processFilterResult($resultFilter)
+    {
 
-		$resultFilter->setHeaders($this->app['headers']);
+        if (is_string($resultFilter)) {
 
-		$resultFilter->send();
-	}
+            $resultFilter = $this->createResponse($resultFilter);
+        }
 
-	protected function processRouteResponse($response)
-	{
+        $resultFilter->setHeaders($this->app['headers']);
 
-		if ($this->shouldBeResponse($response)) {
+        $resultFilter->send();
+    }
 
-			$response = $this->createResponse($response, 200, [
-				'Content-Type' => 'text/html; charset=utf8;'
-			]);
+    protected function processRouteResponse($response)
+    {
 
-		} elseif ($this->shouldBeJsonResponse($response)) {
+        if ($this->shouldBeResponse($response)) {
 
-			$response = $this->createJsonResponse($response, 200);
+            $response = $this->createResponse($response, 200, [
+                'Content-Type' => 'text/html; charset=utf8;'
+            ]);
 
-		} elseif (! $response instanceof Response) {
+        } elseif ($this->shouldBeJsonResponse($response)) {
 
-			throw new \RunTimeException(
-				sprintf(
-					'Unprocessable response of type "%s"',
-					is_object($response) ? get_class($response) : gettype($response)
-				)
-			);
-		}
+            $response = $this->createJsonResponse($response, 200);
 
-		$response->setHeaders($this->app['headers']);
-		
-		$response->send();
-	}
+        } elseif (! $response instanceof Response) {
 
-	protected function shouldBeJsonResponse($candidate)
-	{
-		return is_array($candidate) 
-				|| $candidate instanceof \JsonSerializable 
-				|| $candidate instanceof \ArrayObject 
-				|| $candidate instanceof \stdClass;
-	}
+            throw new \RunTimeException(
+                sprintf(
+                    'Unprocessable response of type "%s"',
+                    is_object($response) ? get_class($response) : gettype($response)
+                )
+            );
+        }
 
-	/**
-	 * Detect if response should be PHPLegends\Http\Response instance
-	 * 
-	 * @param mixed $candidate
-	 * @return boolean
-	 * */
-	protected function shouldBeResponse($candidate)
-	{
-		return is_string($candidate) || $candidate instanceof \PHPLegends\View\View;
-	}
+        $response->setHeaders($this->app['headers']);
 
-	protected function filterRoutesByRequest(Request $request, Collection $routes)
-	{
+        $response->send();
+    }
 
-		$uri = $request->getUri()->getPath();
+    protected function shouldBeJsonResponse($candidate)
+    {
+        return is_array($candidate)
+                || $candidate instanceof \JsonSerializable
+                || $candidate instanceof \ArrayObject
+                || $candidate instanceof \stdClass;
+    }
 
-		$routes = $routes->filterByUri($uri);
+    /**
+     * Detect if response should be PHPLegends\Http\Response instance
+     *
+     * @param mixed $candidate
+     * @return boolean
+     * */
+    protected function shouldBeResponse($candidate)
+    {
+        return is_string($candidate) || $candidate instanceof \PHPLegends\View\View;
+    }
 
-		if ($routes->isEmpty()) {
+    /**
+     *
+     * @param Request $request
+     * @param Collection $routes
+     * @return Collection
+     * */
+    protected function filterRoutesByRequest(Request $request, Collection $routes)
+    {
 
-			throw new NotFoundException("Route '{$uri}' not found");
-		}
+        $uri = $request->getUri()->getPath();
 
-		return $routes;
-	}
+        $routes = $routes->filterByUri($uri);
 
-	protected function resolveRouteAction($route)
-	{
-		$action = $route->getAction();
+        if ($routes->isEmpty()) {
 
-		if (is_array($action)) {
-			
-			$action = $this->resolverControllerInstance($action[0], $action[1]);
+            throw new NotFoundException("Route '{$uri}' not found");
+        }
 
-		} else {
+        return $routes;
+    }
 
-			$action = $action->bindTo($this->app);
-		}
+    protected function resolveRouteAction($route)
+    {
+        $action = $route->getAction();
 
-		return $action;
-	}
+        if (is_array($action)) {
 
-	protected function getHttpException($message, $statusCode = 500)
-	{		
-		return new HttpException($message, $statusCode);
-	}
+            $action = $this->resolverControllerInstance($action[0], $action[1]);
 
-	protected function createResponse($message, $code = 200)
-	{
-		return new Response($message, $code);
-	}
+        } else {
 
-	protected function createJsonResponse($data)
-	{
-		return new JsonResponse($data, 200, $this->app['headers']);
-	}
-	
+            $action = $action->bindTo($this->app);
+        }
+
+        return $action;
+    }
+
+    protected function getHttpException($message, $statusCode = 500)
+    {
+        return new HttpException($message, $statusCode);
+    }
+
+    protected function createResponse($message, $code = 200)
+    {
+        return new Response($message, $code);
+    }
+
+    protected function createJsonResponse($data)
+    {
+        return new JsonResponse($data, 200, $this->app['headers']);
+    }
+
 }

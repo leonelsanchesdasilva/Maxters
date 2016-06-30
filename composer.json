@@ -22,8 +22,7 @@
             "Maxters\\" :  "app"
         },
         "files" : [
-            "framework/functions.php",
-            "db/generated-conf/config.php"
+            "framework/functions.php"
         ]
     }
 }

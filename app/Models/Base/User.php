@@ -5,6 +5,8 @@ namespace Maxters\Models\Base;
 use \Exception;
 use \PDO;
 use Maxters\Models\UserQuery as ChildUserQuery;
+use Maxters\Models\UsersRoles as ChildUsersRoles;
+use Maxters\Models\UsersRolesQuery as ChildUsersRolesQuery;
 use Maxters\Models\Map\UserTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -79,6 +81,11 @@ abstract class User implements ActiveRecordInterface
      * @var        string
      */
     protected $email;
+
+    /**
+     * @var        ChildUsersRoles one-to-one related ChildUsersRoles object
+     */
+    protected $singleUsersRoles;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -516,6 +523,8 @@ abstract class User implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->singleUsersRoles = null;
+
         } // if (deep)
     }
 
@@ -624,6 +633,12 @@ abstract class User implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->singleUsersRoles !== null) {
+                if (!$this->singleUsersRoles->isDeleted() && ($this->singleUsersRoles->isNew() || $this->singleUsersRoles->isModified())) {
+                    $affectedRows += $this->singleUsersRoles->save($con);
+                }
             }
 
             $this->alreadyInSave = false;
@@ -769,10 +784,11 @@ abstract class User implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['User'][$this->hashCode()])) {
@@ -790,6 +806,23 @@ abstract class User implements ActiveRecordInterface
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->singleUsersRoles) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'usersRoles';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'users_roles';
+                        break;
+                    default:
+                        $key = 'UsersRoles';
+                }
+
+                $result[$key] = $this->singleUsersRoles->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -1005,6 +1038,19 @@ abstract class User implements ActiveRecordInterface
     {
         $copyObj->setName($this->getName());
         $copyObj->setEmail($this->getEmail());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            $relObj = $this->getUsersRoles();
+            if ($relObj) {
+                $copyObj->setUsersRoles($relObj->copy($deepCopy));
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1031,6 +1077,55 @@ abstract class User implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+    }
+
+    /**
+     * Gets a single ChildUsersRoles object, which is related to this object by a one-to-one relationship.
+     *
+     * @param  ConnectionInterface $con optional connection object
+     * @return ChildUsersRoles
+     * @throws PropelException
+     */
+    public function getUsersRoles(ConnectionInterface $con = null)
+    {
+
+        if ($this->singleUsersRoles === null && !$this->isNew()) {
+            $this->singleUsersRoles = ChildUsersRolesQuery::create()->findPk($this->getPrimaryKey(), $con);
+        }
+
+        return $this->singleUsersRoles;
+    }
+
+    /**
+     * Sets a single ChildUsersRoles object as related to this object by a one-to-one relationship.
+     *
+     * @param  ChildUsersRoles $v ChildUsersRoles
+     * @return $this|\Maxters\Models\User The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setUsersRoles(ChildUsersRoles $v = null)
+    {
+        $this->singleUsersRoles = $v;
+
+        // Make sure that that the passed-in ChildUsersRoles isn't already associated with this object
+        if ($v !== null && $v->getUser(null, false) === null) {
+            $v->setUser($this);
+        }
+
+        return $this;
     }
 
     /**
@@ -1061,8 +1156,12 @@ abstract class User implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->singleUsersRoles) {
+                $this->singleUsersRoles->clearAllReferences($deep);
+            }
         } // if ($deep)
 
+        $this->singleUsersRoles = null;
     }
 
     /**

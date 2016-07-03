@@ -6,4 +6,21 @@
     <column name="name" type="varchar" size="255" required="true" />
     <column name="email" type="varchar" size="255" required="true" />
   </table>
+
+  <table name="roles" phpName="Roles">
+      <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+      <column name="name" type="varchar" size="255" required="true" />
+  </table>
+
+  <table name="users_roles" isCrossRef="true">
+        <column name="user_id" type="integer" required="true" primaryKey="true" />
+        <column name="role_id" type="integer" required="true" primaryKey="true" />
+        <foreign-key foreignTable="users">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="roles">
+            <reference local="role_id" foreign="id" />
+        </foreign-key>
+  </table>
+
 </database>

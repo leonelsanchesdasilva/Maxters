@@ -13,7 +13,7 @@
         </thead>
         <tbody>
         <tr ng-repeat='(key, route) in routes'>
-            <td>{{ route.pattern }}</td>
+            <td><a href="{{ route.pattern}}">{{ route.pattern }}</a></td>
             <td>{{ route.action }}</td>
             <td>{{ route.name }}</td>
             <td>

@@ -6,8 +6,6 @@ use PHPLegends\Http\JsonResponse;
 
 $router->get('/', 'Maxters\Controllers\Home::index');
 
-$router->get('/json-example', 'Maxters\Controllers\Home::jsonExample');
-
 /**
  *
  * @link http://localhost:8000/test-exception/BadMethodCall
@@ -15,13 +13,6 @@ $router->get('/json-example', 'Maxters\Controllers\Home::jsonExample');
  * @link http://localhost:8000/test-exception/Domain
  *
  * */
-
-$router->get('/test-exception/{str}', function ($exception)
-{
-	$class = $exception . 'Exception';
-
-    throw new $class;
-});
 
 $router->get('/cookie', function () {
 
@@ -45,11 +36,4 @@ $router->post('upload', function () {
 
 $router->get('upload', function () {
     return $this['view']->create('home/upload', []);
-});
-
-
-$router->get('routes', function () use($router)
-{
-    
-});
-
+})->setName('upload');

@@ -13,7 +13,7 @@ class DebugController extends Controller
     }
 
 
-    public function actionInfosGet()
+    public function actionInfosGet($id)
     {
         return $this->render('_debug/infos', ['app' => $this]);
     }
@@ -40,23 +40,21 @@ class DebugController extends Controller
 
     public function actionAjaxRoutesGet()
     {
-        foreach ($this->app['router']->getCollection() as $route) {
+        $routes = $this->app['router']->getCollection()->map(function ($route) {
 
             $action = $route->getAction();
 
-            $response[] = [
+            return [
                 'pattern' => $route->getPattern() ?: '/',
                 'name'    => $route->getName(),
                 'verbs'   => $route->getVerbs(),
                 'action'  => $action instanceof \Closure ? 'Closure' : implode('::', $action) . '()'
             ];
-        }
 
-        usort($response, function ($a, $b) {
-
-            return $a['pattern'] - $b['pattern'];
+        })->sortBy(function ($info) {
+            return $info['pattern'];
         });
 
-        return $response;
+        return $routes->toArray();
     }
 }

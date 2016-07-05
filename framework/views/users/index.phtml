@@ -1,0 +1,55 @@
+<?php $this->extend('layout') ?>
+
+<?php $this->section('title', 'Users List') ?>
+
+<?php $this->section('content') ?>
+
+<form ng-controller="users.create" class="form-horizontal" ng-submit="update(user)" name="userCreate" autocomplete="off">
+ <!--    <div ng-show="userCreate.name.$touched">
+        <div ng-show='userCreate.name.$error.minlength' class='alert alert-danger'>
+            O campo nome deve ter no mínimo 3 caracteres
+        </div>
+    </div> -->
+    <div class="form-group">
+        <div class="col-xs-5" ng-class="{ 'has-error' : userCreate.name.$error.minlength }">
+            <label class='control-label'>Name</label>
+            <input
+                ng-required='true'
+                ng-minlength="3"
+                type="text" ng-model="user.name" class="form-control" name="name">
+        </div>
+
+        <div class="col-xs-5">
+            <label class='control-label'>E-mail</label>
+            <input required type="email" ng-model="user.email" class="form-control" name="email">
+        </div>
+        <div class='col-xs-2'>
+            <div><label class='control-label'>&nbsp;</label></div>
+            <button type='submit'  class='btn btn-primary'>
+                Cadastrar
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="table-responsive" ng-controller="users.index">
+    <table class='table'>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>E-Mail</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="users in users">
+            <td></td>
+        </tr>
+    </tbody>
+    </table>
+</div>
+<?php $this->endSection() ?>
+
+<?php $this->section('scripts') ?>
+<script src="/js/users/index.js"></script>
+<?php $this->endSection() ?>

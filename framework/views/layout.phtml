@@ -3,7 +3,7 @@
 <head>
 	<title><?= $framework ?> Framework</title>
 
-	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
 
     <script src="/js/angularjs/angular.min.js"></script>
 
@@ -14,7 +14,9 @@
 <body>
 	<div class="container">
 		<div>
-		<h1 class="page-title">Welcome to the <u><?= $framework ?></u> Framework</h1></div>
+		<h1 class="page-title">
+            <?= $this->getSection('title', 'Maxters Framework') ?>
+        </div>
 		<div ng-app="content"><?= $this->getSection('content') ?>
 	</div>
 </body>

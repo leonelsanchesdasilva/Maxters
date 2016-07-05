@@ -1,7 +1,7 @@
 <?php $this->extend('layout') ?>
 
 <?php $this->section('content') ?>
-<div ng-controller="infos">
+<div ng-controller="_debug.infos">
     <h4 class='page-title'>Objetos no Maxters\Container</h4>
     <table class="table">
         <tr ng-repeat="(key, value) in infos">
@@ -13,5 +13,5 @@
 <?php $this->endSection() ?>
 
 <?php $this->section('scripts') ?>
-<script type="text/javascript" src="/js/infos.js"></script>
+<script type="text/javascript" src="/js/_debug/infos.js"></script>
 <?php $this->endSection() ?>

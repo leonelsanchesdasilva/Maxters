@@ -19,14 +19,18 @@ class RouterProvider extends AbstractProvider
             return new Router;
         };
 
-        $this->map($app['router']);
+        $this->map($app['router'], $app['config']['debug']);
     }
 
-    protected function map(Router $router)
+    protected function map(Router $router, $debug = false)
     {
-        call_user_func(function () use($router)
-        {
-            include_once APP_PATH . '/routes.php';
-        });
+        include_once APP_PATH . '/routes.php';
+
+        $debug && $this->mapDebug($router);
+    }
+
+    public function mapDebug(Router $router)
+    {
+        include_once APP_PATH . '/routes.debug.php';    
     }
 }

@@ -1,0 +1,30 @@
+<?php $this->extend('layout') ?>
+
+<?php $this->section('content') ?>
+<div ng-controller='_debug.index'>
+    <table class='table'>
+        <thead>
+        <tr>
+            <th>Pattern</th>
+            <th>Action</th>
+            <th>Name</th>
+            <th>Verbs</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat='(key, route) in routes'>
+            <td>{{ route.pattern }}</td>
+            <td>{{ route.action }}</td>
+            <td>{{ route.name }}</td>
+            <td>
+                <code ng-repeat="verb in route.verbs"><strong>{{ verb }}</strong></code>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<?php $this->endSection() ?>
+
+<?php $this->section('scripts') ?>
+<script type="text/javascript" src="/js/_debug/index.js"></script>
+<?php $this->endSection() ?>

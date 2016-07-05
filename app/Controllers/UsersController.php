@@ -8,6 +8,11 @@ use PHPLegends\Http\Exceptions\NotFoundException;
 
 class UsersController extends Controller
 {
+    public function actionIndexGet()
+    {
+
+    }
+
     public function getAjaxInfo($id)
     {
         $user = UserQuery::create()->findPK($id);

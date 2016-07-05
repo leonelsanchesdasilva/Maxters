@@ -14,7 +14,6 @@ $app = new Maxters\Container();
 
 $app->register(new Maxters\Providers\AppProvider($app));
 
-
 if (file_exists($db_config_file = ROOT_PATH . '/db/generated-conf/config.php'))
 {
     require_once $db_config_file;

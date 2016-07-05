@@ -42,8 +42,10 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="users in users">
-            <td></td>
+        <tr ng-repeat="user in users">
+            <td>{{ user.Id }}</td>
+            <td>{{ user.Name }}</td>
+            <td>{{ user.Email }}</td>
         </tr>
     </tbody>
     </table>

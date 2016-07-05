@@ -10,6 +10,7 @@ use Maxters\Models\Map\RolesTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -32,6 +33,18 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRolesQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
  * @method     ChildRolesQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildRolesQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ *
+ * @method     ChildRolesQuery leftJoinUsersRoles($relationAlias = null) Adds a LEFT JOIN clause to the query using the UsersRoles relation
+ * @method     ChildRolesQuery rightJoinUsersRoles($relationAlias = null) Adds a RIGHT JOIN clause to the query using the UsersRoles relation
+ * @method     ChildRolesQuery innerJoinUsersRoles($relationAlias = null) Adds a INNER JOIN clause to the query using the UsersRoles relation
+ *
+ * @method     ChildRolesQuery joinWithUsersRoles($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the UsersRoles relation
+ *
+ * @method     ChildRolesQuery leftJoinWithUsersRoles() Adds a LEFT JOIN clause and with to the query using the UsersRoles relation
+ * @method     ChildRolesQuery rightJoinWithUsersRoles() Adds a RIGHT JOIN clause and with to the query using the UsersRoles relation
+ * @method     ChildRolesQuery innerJoinWithUsersRoles() Adds a INNER JOIN clause and with to the query using the UsersRoles relation
+ *
+ * @method     \Maxters\Models\UsersRolesQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildRoles findOne(ConnectionInterface $con = null) Return the first ChildRoles matching the query
  * @method     ChildRoles findOneOrCreate(ConnectionInterface $con = null) Return the first ChildRoles matching the query, or a new ChildRoles object populated from the query conditions when no match is found
@@ -301,6 +314,96 @@ abstract class RolesQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(RolesTableMap::COL_NAME, $name, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \Maxters\Models\UsersRoles object
+     *
+     * @param \Maxters\Models\UsersRoles|ObjectCollection $usersRoles the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildRolesQuery The current query, for fluid interface
+     */
+    public function filterByUsersRoles($usersRoles, $comparison = null)
+    {
+        if ($usersRoles instanceof \Maxters\Models\UsersRoles) {
+            return $this
+                ->addUsingAlias(RolesTableMap::COL_ID, $usersRoles->getRoleId(), $comparison);
+        } elseif ($usersRoles instanceof ObjectCollection) {
+            return $this
+                ->useUsersRolesQuery()
+                ->filterByPrimaryKeys($usersRoles->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByUsersRoles() only accepts arguments of type \Maxters\Models\UsersRoles or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the UsersRoles relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildRolesQuery The current query, for fluid interface
+     */
+    public function joinUsersRoles($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('UsersRoles');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'UsersRoles');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the UsersRoles relation UsersRoles object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \Maxters\Models\UsersRolesQuery A secondary query class using the current class as primary query
+     */
+    public function useUsersRolesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinUsersRoles($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'UsersRoles', '\Maxters\Models\UsersRolesQuery');
+    }
+
+    /**
+     * Filter the query by a related User object
+     * using the users_roles table as cross reference
+     *
+     * @param User $user the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildRolesQuery The current query, for fluid interface
+     */
+    public function filterByUser($user, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useUsersRolesQuery()
+            ->filterByUser($user, $comparison)
+            ->endUse();
     }
 
     /**

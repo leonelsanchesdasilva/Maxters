@@ -359,10 +359,14 @@ abstract class UserQuery extends ModelCriteria
     {
         if ($usersRoles instanceof \Maxters\Models\UsersRoles) {
             return $this
-                ->addUsingAlias(UserTableMap::COL_ID, $usersRoles->getUserId(), $comparison)
-                ->addUsingAlias(UserTableMap::COL_ID, $usersRoles->getRoleId(), $comparison);
+                ->addUsingAlias(UserTableMap::COL_ID, $usersRoles->getUserId(), $comparison);
+        } elseif ($usersRoles instanceof ObjectCollection) {
+            return $this
+                ->useUsersRolesQuery()
+                ->filterByPrimaryKeys($usersRoles->getPrimaryKeys())
+                ->endUse();
         } else {
-            throw new PropelException('filterByUsersRoles() only accepts arguments of type \Maxters\Models\UsersRoles');
+            throw new PropelException('filterByUsersRoles() only accepts arguments of type \Maxters\Models\UsersRoles or Collection');
         }
     }
 
@@ -414,6 +418,23 @@ abstract class UserQuery extends ModelCriteria
         return $this
             ->joinUsersRoles($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'UsersRoles', '\Maxters\Models\UsersRolesQuery');
+    }
+
+    /**
+     * Filter the query by a related Roles object
+     * using the users_roles table as cross reference
+     *
+     * @param Roles $roles the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildUserQuery The current query, for fluid interface
+     */
+    public function filterByRoles($roles, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useUsersRolesQuery()
+            ->filterByRoles($roles, $comparison)
+            ->endUse();
     }
 
     /**

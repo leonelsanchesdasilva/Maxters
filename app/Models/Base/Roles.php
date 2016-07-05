@@ -4,13 +4,20 @@ namespace Maxters\Models\Base;
 
 use \Exception;
 use \PDO;
+use Maxters\Models\Roles as ChildRoles;
 use Maxters\Models\RolesQuery as ChildRolesQuery;
+use Maxters\Models\User as ChildUser;
+use Maxters\Models\UserQuery as ChildUserQuery;
+use Maxters\Models\UsersRoles as ChildUsersRoles;
+use Maxters\Models\UsersRolesQuery as ChildUsersRolesQuery;
 use Maxters\Models\Map\RolesTableMap;
+use Maxters\Models\Map\UsersRolesTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -74,12 +81,40 @@ abstract class Roles implements ActiveRecordInterface
     protected $name;
 
     /**
+     * @var        ObjectCollection|ChildUsersRoles[] Collection to store aggregation of ChildUsersRoles objects.
+     */
+    protected $collUsersRoless;
+    protected $collUsersRolessPartial;
+
+    /**
+     * @var        ObjectCollection|ChildUser[] Cross Collection to store aggregation of ChildUser objects.
+     */
+    protected $collUsers;
+
+    /**
+     * @var bool
+     */
+    protected $collUsersPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildUser[]
+     */
+    protected $usersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildUsersRoles[]
+     */
+    protected $usersRolessScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Maxters\Models\Base\Roles object.
@@ -476,6 +511,9 @@ abstract class Roles implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collUsersRoless = null;
+
+            $this->collUsers = null;
         } // if (deep)
     }
 
@@ -584,6 +622,52 @@ abstract class Roles implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->usersScheduledForDeletion !== null) {
+                if (!$this->usersScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    foreach ($this->usersScheduledForDeletion as $entry) {
+                        $entryPk = [];
+
+                        $entryPk[1] = $this->getId();
+                        $entryPk[0] = $entry->getId();
+                        $pks[] = $entryPk;
+                    }
+
+                    \Maxters\Models\UsersRolesQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+
+                    $this->usersScheduledForDeletion = null;
+                }
+
+            }
+
+            if ($this->collUsers) {
+                foreach ($this->collUsers as $user) {
+                    if (!$user->isDeleted() && ($user->isNew() || $user->isModified())) {
+                        $user->save($con);
+                    }
+                }
+            }
+
+
+            if ($this->usersRolessScheduledForDeletion !== null) {
+                if (!$this->usersRolessScheduledForDeletion->isEmpty()) {
+                    \Maxters\Models\UsersRolesQuery::create()
+                        ->filterByPrimaryKeys($this->usersRolessScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->usersRolessScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collUsersRoless !== null) {
+                foreach ($this->collUsersRoless as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -720,10 +804,11 @@ abstract class Roles implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['Roles'][$this->hashCode()])) {
@@ -740,6 +825,23 @@ abstract class Roles implements ActiveRecordInterface
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->collUsersRoless) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'usersRoless';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'users_roless';
+                        break;
+                    default:
+                        $key = 'UsersRoless';
+                }
+
+                $result[$key] = $this->collUsersRoless->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+        }
 
         return $result;
     }
@@ -945,6 +1047,20 @@ abstract class Roles implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getUsersRoless() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addUsersRoles($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -971,6 +1087,518 @@ abstract class Roles implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('UsersRoles' == $relationName) {
+            return $this->initUsersRoless();
+        }
+    }
+
+    /**
+     * Clears out the collUsersRoless collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addUsersRoless()
+     */
+    public function clearUsersRoless()
+    {
+        $this->collUsersRoless = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collUsersRoless collection loaded partially.
+     */
+    public function resetPartialUsersRoless($v = true)
+    {
+        $this->collUsersRolessPartial = $v;
+    }
+
+    /**
+     * Initializes the collUsersRoless collection.
+     *
+     * By default this just sets the collUsersRoless collection to an empty array (like clearcollUsersRoless());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initUsersRoless($overrideExisting = true)
+    {
+        if (null !== $this->collUsersRoless && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = UsersRolesTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collUsersRoless = new $collectionClassName;
+        $this->collUsersRoless->setModel('\Maxters\Models\UsersRoles');
+    }
+
+    /**
+     * Gets an array of ChildUsersRoles objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildRoles is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildUsersRoles[] List of ChildUsersRoles objects
+     * @throws PropelException
+     */
+    public function getUsersRoless(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collUsersRolessPartial && !$this->isNew();
+        if (null === $this->collUsersRoless || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collUsersRoless) {
+                // return empty collection
+                $this->initUsersRoless();
+            } else {
+                $collUsersRoless = ChildUsersRolesQuery::create(null, $criteria)
+                    ->filterByRoles($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collUsersRolessPartial && count($collUsersRoless)) {
+                        $this->initUsersRoless(false);
+
+                        foreach ($collUsersRoless as $obj) {
+                            if (false == $this->collUsersRoless->contains($obj)) {
+                                $this->collUsersRoless->append($obj);
+                            }
+                        }
+
+                        $this->collUsersRolessPartial = true;
+                    }
+
+                    return $collUsersRoless;
+                }
+
+                if ($partial && $this->collUsersRoless) {
+                    foreach ($this->collUsersRoless as $obj) {
+                        if ($obj->isNew()) {
+                            $collUsersRoless[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collUsersRoless = $collUsersRoless;
+                $this->collUsersRolessPartial = false;
+            }
+        }
+
+        return $this->collUsersRoless;
+    }
+
+    /**
+     * Sets a collection of ChildUsersRoles objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $usersRoless A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildRoles The current object (for fluent API support)
+     */
+    public function setUsersRoless(Collection $usersRoless, ConnectionInterface $con = null)
+    {
+        /** @var ChildUsersRoles[] $usersRolessToDelete */
+        $usersRolessToDelete = $this->getUsersRoless(new Criteria(), $con)->diff($usersRoless);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->usersRolessScheduledForDeletion = clone $usersRolessToDelete;
+
+        foreach ($usersRolessToDelete as $usersRolesRemoved) {
+            $usersRolesRemoved->setRoles(null);
+        }
+
+        $this->collUsersRoless = null;
+        foreach ($usersRoless as $usersRoles) {
+            $this->addUsersRoles($usersRoles);
+        }
+
+        $this->collUsersRoless = $usersRoless;
+        $this->collUsersRolessPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related UsersRoles objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related UsersRoles objects.
+     * @throws PropelException
+     */
+    public function countUsersRoless(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collUsersRolessPartial && !$this->isNew();
+        if (null === $this->collUsersRoless || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collUsersRoless) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getUsersRoless());
+            }
+
+            $query = ChildUsersRolesQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByRoles($this)
+                ->count($con);
+        }
+
+        return count($this->collUsersRoless);
+    }
+
+    /**
+     * Method called to associate a ChildUsersRoles object to this object
+     * through the ChildUsersRoles foreign key attribute.
+     *
+     * @param  ChildUsersRoles $l ChildUsersRoles
+     * @return $this|\Maxters\Models\Roles The current object (for fluent API support)
+     */
+    public function addUsersRoles(ChildUsersRoles $l)
+    {
+        if ($this->collUsersRoless === null) {
+            $this->initUsersRoless();
+            $this->collUsersRolessPartial = true;
+        }
+
+        if (!$this->collUsersRoless->contains($l)) {
+            $this->doAddUsersRoles($l);
+
+            if ($this->usersRolessScheduledForDeletion and $this->usersRolessScheduledForDeletion->contains($l)) {
+                $this->usersRolessScheduledForDeletion->remove($this->usersRolessScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildUsersRoles $usersRoles The ChildUsersRoles object to add.
+     */
+    protected function doAddUsersRoles(ChildUsersRoles $usersRoles)
+    {
+        $this->collUsersRoless[]= $usersRoles;
+        $usersRoles->setRoles($this);
+    }
+
+    /**
+     * @param  ChildUsersRoles $usersRoles The ChildUsersRoles object to remove.
+     * @return $this|ChildRoles The current object (for fluent API support)
+     */
+    public function removeUsersRoles(ChildUsersRoles $usersRoles)
+    {
+        if ($this->getUsersRoless()->contains($usersRoles)) {
+            $pos = $this->collUsersRoless->search($usersRoles);
+            $this->collUsersRoless->remove($pos);
+            if (null === $this->usersRolessScheduledForDeletion) {
+                $this->usersRolessScheduledForDeletion = clone $this->collUsersRoless;
+                $this->usersRolessScheduledForDeletion->clear();
+            }
+            $this->usersRolessScheduledForDeletion[]= clone $usersRoles;
+            $usersRoles->setRoles(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Roles is new, it will return
+     * an empty collection; or if this Roles has previously
+     * been saved, it will retrieve related UsersRoless from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Roles.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildUsersRoles[] List of ChildUsersRoles objects
+     */
+    public function getUsersRolessJoinUser(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildUsersRolesQuery::create(null, $criteria);
+        $query->joinWith('User', $joinBehavior);
+
+        return $this->getUsersRoless($query, $con);
+    }
+
+    /**
+     * Clears out the collUsers collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addUsers()
+     */
+    public function clearUsers()
+    {
+        $this->collUsers = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Initializes the collUsers crossRef collection.
+     *
+     * By default this just sets the collUsers collection to an empty collection (like clearUsers());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initUsers()
+    {
+        $collectionClassName = UsersRolesTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collUsers = new $collectionClassName;
+        $this->collUsersPartial = true;
+        $this->collUsers->setModel('\Maxters\Models\User');
+    }
+
+    /**
+     * Checks if the collUsers collection is loaded.
+     *
+     * @return bool
+     */
+    public function isUsersLoaded()
+    {
+        return null !== $this->collUsers;
+    }
+
+    /**
+     * Gets a collection of ChildUser objects related by a many-to-many relationship
+     * to the current object by way of the users_roles cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildRoles is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildUser[] List of ChildUser objects
+     */
+    public function getUsers(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collUsersPartial && !$this->isNew();
+        if (null === $this->collUsers || null !== $criteria || $partial) {
+            if ($this->isNew()) {
+                // return empty collection
+                if (null === $this->collUsers) {
+                    $this->initUsers();
+                }
+            } else {
+
+                $query = ChildUserQuery::create(null, $criteria)
+                    ->filterByRoles($this);
+                $collUsers = $query->find($con);
+                if (null !== $criteria) {
+                    return $collUsers;
+                }
+
+                if ($partial && $this->collUsers) {
+                    //make sure that already added objects gets added to the list of the database.
+                    foreach ($this->collUsers as $obj) {
+                        if (!$collUsers->contains($obj)) {
+                            $collUsers[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collUsers = $collUsers;
+                $this->collUsersPartial = false;
+            }
+        }
+
+        return $this->collUsers;
+    }
+
+    /**
+     * Sets a collection of User objects related by a many-to-many relationship
+     * to the current object by way of the users_roles cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $users A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return $this|ChildRoles The current object (for fluent API support)
+     */
+    public function setUsers(Collection $users, ConnectionInterface $con = null)
+    {
+        $this->clearUsers();
+        $currentUsers = $this->getUsers();
+
+        $usersScheduledForDeletion = $currentUsers->diff($users);
+
+        foreach ($usersScheduledForDeletion as $toDelete) {
+            $this->removeUser($toDelete);
+        }
+
+        foreach ($users as $user) {
+            if (!$currentUsers->contains($user)) {
+                $this->doAddUser($user);
+            }
+        }
+
+        $this->collUsersPartial = false;
+        $this->collUsers = $users;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of User objects related by a many-to-many relationship
+     * to the current object by way of the users_roles cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related User objects
+     */
+    public function countUsers(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collUsersPartial && !$this->isNew();
+        if (null === $this->collUsers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collUsers) {
+                return 0;
+            } else {
+
+                if ($partial && !$criteria) {
+                    return count($this->getUsers());
+                }
+
+                $query = ChildUserQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByRoles($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collUsers);
+        }
+    }
+
+    /**
+     * Associate a ChildUser to this object
+     * through the users_roles cross reference table.
+     *
+     * @param ChildUser $user
+     * @return ChildRoles The current object (for fluent API support)
+     */
+    public function addUser(ChildUser $user)
+    {
+        if ($this->collUsers === null) {
+            $this->initUsers();
+        }
+
+        if (!$this->getUsers()->contains($user)) {
+            // only add it if the **same** object is not already associated
+            $this->collUsers->push($user);
+            $this->doAddUser($user);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param ChildUser $user
+     */
+    protected function doAddUser(ChildUser $user)
+    {
+        $usersRoles = new ChildUsersRoles();
+
+        $usersRoles->setUser($user);
+
+        $usersRoles->setRoles($this);
+
+        $this->addUsersRoles($usersRoles);
+
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$user->isRolessLoaded()) {
+            $user->initRoless();
+            $user->getRoless()->push($this);
+        } elseif (!$user->getRoless()->contains($this)) {
+            $user->getRoless()->push($this);
+        }
+
+    }
+
+    /**
+     * Remove user of this object
+     * through the users_roles cross reference table.
+     *
+     * @param ChildUser $user
+     * @return ChildRoles The current object (for fluent API support)
+     */
+    public function removeUser(ChildUser $user)
+    {
+        if ($this->getUsers()->contains($user)) { $usersRoles = new ChildUsersRoles();
+
+            $usersRoles->setUser($user);
+            if ($user->isRolessLoaded()) {
+                //remove the back reference if available
+                $user->getRoless()->removeObject($this);
+            }
+
+            $usersRoles->setRoles($this);
+            $this->removeUsersRoles(clone $usersRoles);
+            $usersRoles->clear();
+
+            $this->collUsers->remove($this->collUsers->search($user));
+
+            if (null === $this->usersScheduledForDeletion) {
+                $this->usersScheduledForDeletion = clone $this->collUsers;
+                $this->usersScheduledForDeletion->clear();
+            }
+
+            $this->usersScheduledForDeletion->push($user);
+        }
+
+
+        return $this;
     }
 
     /**
@@ -1000,8 +1628,20 @@ abstract class Roles implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collUsersRoless) {
+                foreach ($this->collUsersRoless as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collUsers) {
+                foreach ($this->collUsers as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collUsersRoless = null;
+        $this->collUsers = null;
     }
 
     /**

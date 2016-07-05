@@ -133,7 +133,7 @@ class UsersRolesTableMap extends TableMap
         $this->setIsCrossRef(true);
         // columns
         $this->addForeignPrimaryKey('user_id', 'UserId', 'INTEGER' , 'users', 'id', true, null, null);
-        $this->addForeignPrimaryKey('role_id', 'RoleId', 'INTEGER' , 'users', 'id', true, null, null);
+        $this->addForeignPrimaryKey('role_id', 'RoleId', 'INTEGER' , 'roles', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -147,7 +147,9 @@ class UsersRolesTableMap extends TableMap
     0 => ':user_id',
     1 => ':id',
   ),
-  1 =>
+), null, null, null, false);
+        $this->addRelation('Roles', '\\Maxters\\Models\\Roles', RelationMap::MANY_TO_ONE, array (
+  0 =>
   array (
     0 => ':role_id',
     1 => ':id',

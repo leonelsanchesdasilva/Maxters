@@ -4,6 +4,8 @@ namespace Maxters\Models\Base;
 
 use \Exception;
 use \PDO;
+use Maxters\Models\Roles as ChildRoles;
+use Maxters\Models\RolesQuery as ChildRolesQuery;
 use Maxters\Models\User as ChildUser;
 use Maxters\Models\UserQuery as ChildUserQuery;
 use Maxters\Models\UsersRolesQuery as ChildUsersRolesQuery;
@@ -79,6 +81,11 @@ abstract class UsersRoles implements ActiveRecordInterface
      * @var        ChildUser
      */
     protected $aUser;
+
+    /**
+     * @var        ChildRoles
+     */
+    protected $aRoles;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -374,8 +381,8 @@ abstract class UsersRoles implements ActiveRecordInterface
             $this->modifiedColumns[UsersRolesTableMap::COL_ROLE_ID] = true;
         }
 
-        if ($this->aUser !== null && $this->aUser->getId() !== $v) {
-            $this->aUser = null;
+        if ($this->aRoles !== null && $this->aRoles->getId() !== $v) {
+            $this->aRoles = null;
         }
 
         return $this;
@@ -455,8 +462,8 @@ abstract class UsersRoles implements ActiveRecordInterface
         if ($this->aUser !== null && $this->user_id !== $this->aUser->getId()) {
             $this->aUser = null;
         }
-        if ($this->aUser !== null && $this->role_id !== $this->aUser->getId()) {
-            $this->aUser = null;
+        if ($this->aRoles !== null && $this->role_id !== $this->aRoles->getId()) {
+            $this->aRoles = null;
         }
     } // ensureConsistency
 
@@ -498,6 +505,7 @@ abstract class UsersRoles implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aUser = null;
+            $this->aRoles = null;
         } // if (deep)
     }
 
@@ -607,6 +615,13 @@ abstract class UsersRoles implements ActiveRecordInterface
                     $affectedRows += $this->aUser->save($con);
                 }
                 $this->setUser($this->aUser);
+            }
+
+            if ($this->aRoles !== null) {
+                if ($this->aRoles->isModified() || $this->aRoles->isNew()) {
+                    $affectedRows += $this->aRoles->save($con);
+                }
+                $this->setRoles($this->aRoles);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -780,6 +795,21 @@ abstract class UsersRoles implements ActiveRecordInterface
 
                 $result[$key] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->aRoles) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'roles';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'roles';
+                        break;
+                    default:
+                        $key = 'Roles';
+                }
+
+                $result[$key] = $this->aRoles->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
         }
 
         return $result;
@@ -936,8 +966,15 @@ abstract class UsersRoles implements ActiveRecordInterface
         $validPrimaryKeyFKs = 2;
         $primaryKeyFKs = [];
 
-        //relation users_roles_fk_1e31d2 to table users
+        //relation users_roles_fk_69bd79 to table users
         if ($this->aUser && $hash = spl_object_hash($this->aUser)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
+
+        //relation users_roles_fk_06a84f to table roles
+        if ($this->aRoles && $hash = spl_object_hash($this->aRoles)) {
             $primaryKeyFKs[] = $hash;
         } else {
             $validPrimaryKeyFKs = false;
@@ -1044,17 +1081,12 @@ abstract class UsersRoles implements ActiveRecordInterface
             $this->setUserId($v->getId());
         }
 
-        if ($v === null) {
-            $this->setRoleId(NULL);
-        } else {
-            $this->setRoleId($v->getId());
-        }
-
         $this->aUser = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildUser object, it will not be re-added.
         if ($v !== null) {
-            $v->setUsersRoles($this);
+            $v->addUsersRoles($this);
         }
 
 
@@ -1071,15 +1103,69 @@ abstract class UsersRoles implements ActiveRecordInterface
      */
     public function getUser(ConnectionInterface $con = null)
     {
-        if ($this->aUser === null && ($this->user_id !== null && $this->role_id !== null)) {
-            $this->aUser = ChildUserQuery::create()
-                ->filterByUsersRoles($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aUser->setUsersRoles($this);
+        if ($this->aUser === null && ($this->user_id !== null)) {
+            $this->aUser = ChildUserQuery::create()->findPk($this->user_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aUser->addUsersRoless($this);
+             */
         }
 
         return $this->aUser;
+    }
+
+    /**
+     * Declares an association between this object and a ChildRoles object.
+     *
+     * @param  ChildRoles $v
+     * @return $this|\Maxters\Models\UsersRoles The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setRoles(ChildRoles $v = null)
+    {
+        if ($v === null) {
+            $this->setRoleId(NULL);
+        } else {
+            $this->setRoleId($v->getId());
+        }
+
+        $this->aRoles = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildRoles object, it will not be re-added.
+        if ($v !== null) {
+            $v->addUsersRoles($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildRoles object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildRoles The associated ChildRoles object.
+     * @throws PropelException
+     */
+    public function getRoles(ConnectionInterface $con = null)
+    {
+        if ($this->aRoles === null && ($this->role_id !== null)) {
+            $this->aRoles = ChildRolesQuery::create()->findPk($this->role_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aRoles->addUsersRoless($this);
+             */
+        }
+
+        return $this->aRoles;
     }
 
     /**
@@ -1091,6 +1177,9 @@ abstract class UsersRoles implements ActiveRecordInterface
     {
         if (null !== $this->aUser) {
             $this->aUser->removeUsersRoles($this);
+        }
+        if (null !== $this->aRoles) {
+            $this->aRoles->removeUsersRoles($this);
         }
         $this->user_id = null;
         $this->role_id = null;
@@ -1115,6 +1204,7 @@ abstract class UsersRoles implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aUser = null;
+        $this->aRoles = null;
     }
 
     /**

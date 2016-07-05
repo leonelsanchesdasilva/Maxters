@@ -22,9 +22,18 @@ class UsersController extends Controller
 
     public function actionAjaxCreatePost()
     {
-        $request = $this->request()->getBody();
+        $data = $this->request()->getJsonContent();
 
-        return ['post' => $request->all(), 'json' => $this->request()->getContent()];
+        $user = new User;
+
+        $user->setEmail($data['email']);
+
+        $user->setName($data['name']);
+
+        $user->save();
+
+        return $user->toArray();
+
     }
 
     public function getAjaxInfo($id)

@@ -140,6 +140,14 @@ class RolesTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('UsersRoles', '\\Maxters\\Models\\UsersRoles', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':role_id',
+    1 => ':id',
+  ),
+), null, null, 'UsersRoless', false);
+        $this->addRelation('User', '\\Maxters\\Models\\User', RelationMap::MANY_TO_MANY, array(), null, null, 'Users');
     } // buildRelations()
 
     /**

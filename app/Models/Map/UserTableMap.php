@@ -146,19 +146,28 @@ class UserTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('UsersRoles', '\\Maxters\\Models\\UsersRoles', RelationMap::ONE_TO_ONE, array (
+        $this->addRelation('UsersRoles', '\\Maxters\\Models\\UsersRoles', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
     0 => ':user_id',
     1 => ':id',
   ),
-  1 =>
-  array (
-    0 => ':role_id',
-    1 => ':id',
-  ),
-), null, null, null, false);
+), null, null, 'UsersRoless', false);
+        $this->addRelation('Roles', '\\Maxters\\Models\\Roles', RelationMap::MANY_TO_MANY, array(), null, null, 'Roless');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'validate' => array('rule1' => array ('column' => 'email','validator' => 'Unique',), ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.

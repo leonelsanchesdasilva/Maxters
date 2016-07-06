@@ -36,3 +36,5 @@ cd db
 php propel config:convert
 
 ```
+
+Para rodar o servidor de maneira mais fácil no Linux, use o comando `sh server.sh`

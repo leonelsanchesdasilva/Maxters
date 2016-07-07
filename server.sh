@@ -1,1 +1,1 @@
-/usr/bin/php -S localhost:$1 -t web/
+/usr/bin/php5.6 -S localhost:$1 -t web/

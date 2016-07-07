@@ -1,3 +1,3 @@
-var app = angular.module('content', []);
+var app = angular.module('content', ['ngRoute']);
 
 

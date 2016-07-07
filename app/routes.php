@@ -4,21 +4,14 @@ use PHPLegends\Http\Response;
 use PHPLegends\Http\RedirectResponse;
 use PHPLegends\Http\JsonResponse;
 
-$router->get('/', 'Maxters\Controllers\Home::index');
+$router->get('/', 'Maxters\Controllers\Home::index')->setName('home');
 
-/**
- *
- * @link http://localhost:8000/test-exception/BadMethodCall
- * @link http://localhost:8000/test-exception/Length
- * @link http://localhost:8000/test-exception/Domain
- *
- * */
 
 $router->get('/cookie', function () {
 
-    $this['cookies']->set('name', 'Wallace');
+    $this->app['cookies']->set('name', 'Wallace');
 
-    $this['headers']->merge(['X-Men' => 'Evolution']);
+    $this->app['headers']->merge(['X-Men' => 'Evolution']);
 
     return ['My name is json'];
 
@@ -26,7 +19,7 @@ $router->get('/cookie', function () {
 
 $router->post('upload', function () {
 
-    foreach ($this['request']->getUploadedFiles()->get('files') as $file) {
+    foreach ($this->request()->getUploadedFiles()->get('files') as $file) {
 
         $file->moveToDirectory(WEB_PATH . '/uploads/');
     }
@@ -35,5 +28,20 @@ $router->post('upload', function () {
 });
 
 $router->get('upload', function () {
-    return $this['view']->create('home/upload', []);
+
+    return $this->render('home/upload', []);
+
 })->setName('upload');
+
+
+$router->get('redirect', function () {
+
+    return new RedirectResponse('/users');
+
+})->setName('redirect_to.users');
+
+
+$router->group(['namespace' => 'Maxters\Controllers'], function ($router)
+{
+    $router->routable('UsersController');
+});

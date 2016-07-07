@@ -2,7 +2,7 @@ app.controller('users.index', function ($scope, $http) {
 
     (function _ajax() {
 
-        _ajax.page = typeof(_ajax.page) === 'undefined' ? 1 : ++_ajax.page;
+        _ajax.page = typeof(_ajax.page) === 'undefined' ? 0 : ++_ajax.page;
 
         $http.get('/users/ajax-list/' + _ajax.page).then(function (response) {
 
@@ -15,19 +15,14 @@ app.controller('users.index', function ($scope, $http) {
         });
 
     })();
-});
 
-app.controller('users.create', function ($scope, $http) {
-
-    $scope.update = function(user) {
+    $scope.create = function(user) {
 
         $http.post(
             '/users/ajax-create',
-            user,
-            {'Content-Type' : 'application/x-www-form-urlencoded'}
+            user
         ).then(function (response) {
-
-            console.log(response.data)
+            $scope.users.push(response.data);
         });
     };
 });

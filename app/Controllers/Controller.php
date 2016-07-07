@@ -14,6 +14,8 @@ class Controller
 	public function setApp(PimpleContainer $app)
 	{
 		$this->app = $app;
+
+		return $this;
 	}
 
 	protected function request($key = null)
@@ -31,6 +33,15 @@ class Controller
 	public function render($view, $data = [])
 	{
 		return $this->app['view']->create($view, $data);
+	}
+
+	/**
+	 *
+	 * @return \Spot\Locator
+	 * */
+	public function db()
+	{
+		return $this->app['db'];
 	}
 
 }

@@ -11,11 +11,12 @@ class AppProvider extends AbstractProvider
 		'Maxters\Providers\RouterProvider',
 		'Maxters\Providers\ViewProvider',
 		'Maxters\Providers\HttpProvider',
+		'Maxters\Providers\DatabaseProvider',
 	];
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param Container $app
 	 * @return void
 	 * */
@@ -36,7 +37,17 @@ class AppProvider extends AbstractProvider
 
 	protected function registryConfiguration(Container $app)
 	{
-		$app['config'] = include APP_PATH . '/config.php';
+		$configFile = RESOURCES_PATH . '/config.php';
+
+		if (! file_exists($configFile)) {
+
+			throw new \RuntimeException(
+				"Configuration file '{$configFile}' doesn't exists"
+			);
+		}
+
+		$app['config'] = include_once $configFile;
+
 	}
 
 }

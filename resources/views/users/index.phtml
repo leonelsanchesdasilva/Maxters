@@ -4,7 +4,7 @@
 
 <?php $this->section('content') ?>
 
-<form ng-controller="users.create" class="form-horizontal" ng-submit="update(user)" name="userCreate" autocomplete="off">
+<form ng-controller="users.index" class="form-horizontal" ng-submit="create(user)" name="userCreate" autocomplete="off">
  <!--    <div ng-show="userCreate.name.$touched">
         <div ng-show='userCreate.name.$error.minlength' class='alert alert-danger'>
             O campo nome deve ter no mínimo 3 caracteres
@@ -30,26 +30,26 @@
             </button>
         </div>
     </div>
-</form>
 
-<div class="table-responsive" ng-controller="users.index">
-    <table class='table'>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>E-Mail</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="user in users">
-            <td>{{ user.Id }}</td>
-            <td>{{ user.Name }}</td>
-            <td>{{ user.Email }}</td>
-        </tr>
-    </tbody>
-    </table>
-</div>
+    <div class="table-responsive">
+        <table class='table' id="table-users">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>E-Mail</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in users">
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+</form>
 <?php $this->endSection() ?>
 
 <?php $this->section('scripts') ?>

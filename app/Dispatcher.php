@@ -3,11 +3,12 @@
 namespace Maxters;
 
 use Maxters\Container;
+use PHPLegends\Http\Request;
+use Maxters\Controllers\Controller;
 use PHPLegends\Routes\Router;
 use PHPLegends\Http\Response;
 use PHPLegends\Routes\Collection;
 use PHPLegends\Http\JsonResponse;
-use PHPLegends\Http\Request;
 use PHPLegends\Routes\Dispatchable;
 use PHPLegends\Http\Exceptions\HttpException;
 use PHPLegends\Http\Exceptions\NotFoundException;
@@ -75,7 +76,7 @@ class Dispatcher implements Dispatchable
      * @param string $class
      * @param string $method
      * */
-    protected function resolverControllerInstance($class, $method)
+    protected function resolveControllerInstance($class, $method)
     {
         $controller = new $class;
 
@@ -126,7 +127,7 @@ class Dispatcher implements Dispatchable
             );
         }
 
-        $response->setHeaders($this->app['headers']);
+        $response->getHeaders()->addAll($this->app['headers']);
 
         $response->send();
     }
@@ -177,11 +178,13 @@ class Dispatcher implements Dispatchable
 
         if (is_array($action)) {
 
-            $action = $this->resolverControllerInstance($action[0], $action[1]);
+            $action = $this->resolveControllerInstance($action[0], $action[1]);
 
         } else {
 
-            $action = $action->bindTo($this->app);
+            $controller = (new Controller())->setApp($this->app);
+
+            $action = $action->bindTo($controller, 'Maxters\Controllers\Controller');
         }
 
         return $action;

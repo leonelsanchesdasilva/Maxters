@@ -3,7 +3,7 @@
 return [
 	'debug' => true,
 	'view'  => [
-		'default_path'  => FRAMEWORK_PATH . '/views/',
+		'default_path'  => RESOURCES_PATH . '/views/',
 		'extensions' => [
             'phtml' => NULL,
             'tpl'   => (unset) 'DefineYourCompile'

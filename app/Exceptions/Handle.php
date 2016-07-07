@@ -8,9 +8,9 @@ use PHPLegends\Http\Exceptions\NotFoundException;
 use PHPLegends\Http\Exceptions\HttpExceptionInterface;
 
 class Handle
-{   
+{
     /**
-     * 
+     *
      * @param Container $app
      * */
     public function __construct(Container $app)
@@ -20,9 +20,9 @@ class Handle
 
     /**
      * Render method called in set_exception_handler
-     * 
+     *
      * @param \Exception $exception
-     * 
+     *
      * */
     public function render(\Exception $exception)
     {

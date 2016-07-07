@@ -10,8 +10,8 @@ use PHPLegends\Http\ResponseHeaderCollection;
 class HttpProvider extends AbstractProvider
 {
     /**
-     * 
-     * 
+     *
+     *
      * @param Container $app
      * @return void
      * */
@@ -23,10 +23,8 @@ class HttpProvider extends AbstractProvider
         $app['cookies'] = new CookieJar;
 
         $app['headers'] = function ($app) {
-            
-            $headers = new ResponseHeaderCollection;
 
-            $headers['content-type'] = 'text/html; charset=utf-8;';
+            $headers = new ResponseHeaderCollection;
 
             return $headers->setCookies($app['cookies']);
         };

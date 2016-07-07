@@ -22,7 +22,7 @@
             "Maxters\\" :  "app"
         },
         "files" : [
-            "framework/functions.php"
+            "resources/functions.php"
         ]
     }
 }

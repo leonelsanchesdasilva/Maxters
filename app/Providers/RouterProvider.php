@@ -15,9 +15,7 @@ class RouterProvider extends AbstractProvider
      * */
     public function register(Container $app)
     {
-        $app['router'] = function () {
-            return new Router;
-        };
+        $app['router'] = new Router;
 
         $this->map($app['router'], $app['config']['debug']);
     }

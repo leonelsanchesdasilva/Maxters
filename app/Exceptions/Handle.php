@@ -55,9 +55,9 @@ class Handle
     {
         $fileObject = new \SplFileObject($exception->getFile(), 'r');
 
-        $errorLines = new \LimitIterator(
-            $fileObject, $exception->getLine() - 5, $exception->getLine() + 5
-        );
+        $linePos = max(0, $exception->getLine() - 5);
+
+        $errorLines = new \LimitIterator($fileObject, $linePos, 15);
 
         $view = $this->app['view']->create($view, compact('exception', 'errorLines'));
 

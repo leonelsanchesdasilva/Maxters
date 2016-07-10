@@ -8,9 +8,9 @@ use Pimple\Container;
 class AppProvider extends AbstractProvider
 {
 	protected $providers = [
+		'Maxters\Providers\HttpProvider',
 		'Maxters\Providers\RouterProvider',
 		'Maxters\Providers\ViewProvider',
-		'Maxters\Providers\HttpProvider',
 		'Maxters\Providers\DatabaseProvider',
 	];
 

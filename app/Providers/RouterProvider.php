@@ -4,6 +4,7 @@ namespace Maxters\Providers;
 
 use Pimple\Container;
 use PHPLegends\Routes\Router;
+use PHPLegends\Routes\UrlGenerator;
 
 class RouterProvider extends AbstractProvider
 {
@@ -16,6 +17,13 @@ class RouterProvider extends AbstractProvider
     public function register(Container $app)
     {
         $app['router'] = new Router;
+
+        $app['current_route'] = null;
+
+        $app['url'] = function ($app) {
+
+            return new UrlGenerator($app['router'], $app['request']->getUri()->getHostWithScheme());
+        };
 
         $this->map($app['router'], $app['config']['debug']);
     }

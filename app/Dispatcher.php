@@ -54,6 +54,8 @@ class Dispatcher implements Dispatchable
             throw $this->getHttpException($message, 405);
         }
 
+        $this->app['current_route'] = $route;
+
         $resultFilter = $router->getFilters()
                                 ->processRouteFilters($route, $this->app);
 

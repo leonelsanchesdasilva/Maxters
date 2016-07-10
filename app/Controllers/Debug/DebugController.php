@@ -12,8 +12,7 @@ class DebugController extends Controller
         return $this->render('_debug/index');
     }
 
-
-    public function actionInfosGet($id)
+    public function actionInfosGet()
     {
         return $this->render('_debug/infos', ['app' => $this]);
     }
@@ -42,16 +41,15 @@ class DebugController extends Controller
     {
         $routes = $this->app['router']->getCollection()->map(function ($route) {
 
-            $action = $route->getAction();
-
             return [
                 'pattern' => $route->getPattern() ?: '/',
                 'name'    => $route->getName(),
                 'verbs'   => $route->getVerbs(),
-                'action'  => $action instanceof \Closure ? 'Closure' : implode('::', $action) . '()'
+                'action'  => $route->getActionName() . ' ()'
             ];
 
         })->sortBy(function ($info) {
+            
             return $info['pattern'];
         });
 

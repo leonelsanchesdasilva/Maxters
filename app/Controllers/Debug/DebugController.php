@@ -14,7 +14,7 @@ class DebugController extends Controller
 
     public function actionInfosGet()
     {
-        return $this->render('_debug/infos', ['app' => $this]);
+        return $this->render('_debug/infos');
     }
 
     public function actionAjaxInfosGet()

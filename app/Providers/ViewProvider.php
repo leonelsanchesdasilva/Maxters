@@ -34,7 +34,7 @@ class ViewProvider extends AbstractProvider
             return new Factory($app['view.finder'], $app['view.data']);
         };
 
-        $app['view.data']->define('__app', $app);
+        $app['view.data']->define('app', $app);
 
         $this->sharedData($app['view.data']);
     }
@@ -49,8 +49,7 @@ class ViewProvider extends AbstractProvider
     {   
         // Não é a mesma coisa que "set"
         // Se você usar define, está dizendo que não pode ser removido ou sobrescrito
-        // Isso é útil em casos onde a substituĩção não é desejada
-
+        // Isso é útil em casos onde a substituição não é desejada
 
         $data->define('framework', 'Maxters');
     }

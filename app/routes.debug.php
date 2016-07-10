@@ -58,3 +58,10 @@ $router->get('redirect', function () {
     );
 
 })->setName('redirect_to.home');
+
+
+
+$router->get('headers', function ()
+{
+    return $this->app['request']->getHeaders()->toArray();
+});

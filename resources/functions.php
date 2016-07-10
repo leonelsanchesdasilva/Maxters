@@ -2,20 +2,16 @@
 
 namespace Maxters;
 
-
-// Esse arquivo é carregado pelo composer
-
-
 /**
- *
- *
+ * Debug variable and values
+ * 
  * @param ...$args
  * @return void
  **/
 function debug()
 {
-    foreach (func_get_args() as $value)
-    {
+    foreach (func_get_args() as $value) {
+        
         echo '<pre style="color:#fff;background-color:#222;padding:15px">';
 
         if (is_scalar($value))

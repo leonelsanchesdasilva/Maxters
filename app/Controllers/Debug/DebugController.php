@@ -55,4 +55,21 @@ class DebugController extends Controller
 
         return $routes->toArray();
     }
+
+
+    public function actionAjaxHeadersGet()
+    {
+        return $this->app['request']->getHeaders()->toArray();
+    }
+
+    public function actionAjaxCheckGet()
+    {
+        return ['is_xhr' => $this->request()->isXhr()];
+    }
+
+
+    public function actionAjaxHeaderAcceptGet()
+    {
+        return ['accept' => $this->request()->getHeaders()->getLine('Content-Type')];
+    }
 }

@@ -2,29 +2,99 @@
 
 namespace Maxters\Models;
 
-use Spot\Entity;
-use Spot\EntityInterface;
-use Spot\MapperInterface;
-
-class User extends Entity
+/**
+ * @Table(name="users")
+ * @Entity
+ * */
+class User
 {
-    protected static $table = 'users';
+    /**
+     * 
+     * @Column(type="string", length=255)
+     * */
+    protected $name;
 
-    public static function fields()
+    /**
+     * 
+     * @Column(type="string", length=255, unique=true)
+     * */
+    protected $email;
+
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
+    protected $id = null;
+
+    /**
+     * Gets the value of name.
+     *
+     * @return mixed
+     */
+    public function getName()
     {
-        return [
-            'id'    => ['type' => 'integer', 'autoincrement' => true, 'primary' => true],
-            'name'  => ['type' => 'string', 'required' => true],
-            'email' => ['type' => 'text', 'required' => true],
-        ];
+        return $this->name;
     }
 
-    public static function relations(MapperInterface $mapper, EntityInterface $entity)
+    /**
+     * Sets the value of name.
+     *
+     * @param mixed $name the name
+     *
+     * @return self
+     */
+    public function setName($name)
     {
-        return [
-            // 'tags' => $mapper->hasManyThrough($entity, 'Entity\Tag', 'Entity\PostTag', 'tag_id', 'post_id'),
-            // 'comments' => $mapper->hasMany($entity, 'Entity\Post\Comment', 'post_id')->order(['date_created' => 'ASC']),
-            // 'author' => $mapper->belongsTo($entity, 'Entity\Author', 'author_id')
-        ];
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of email.
+     *
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Sets the value of email.
+     *
+     * @param mixed $email the email
+     *
+     * @return self
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of id.
+     *
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Sets the value of id.
+     *
+     * @param mixed $id the id
+     *
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 }

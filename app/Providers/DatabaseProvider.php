@@ -2,31 +2,31 @@
 
 namespace Maxters\Providers;
 
-use PHPLegends\Http\Response;
 use Pimple\Container;
+use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Common\ClassLoader;
 
 class DatabaseProvider extends AbstractProvider
 {
     public function register(Container $app)
     {
-        $app['db.config'] = function () {
 
-            $config = include RESOURCES_PATH . '/database.php';
+        $config = include RESOURCES_PATH . '/database.php';
 
-            $dbConfig = new \Spot\Config();
+        $app['db.config'] = function ($app) {
 
-            foreach ($config['connections'] as $name => $connectionData) {
-
-                $dbConfig->addConnection($name, $connectionData);
-            }
-
-            return $dbConfig;
-
+            return Setup::createAnnotationMetadataConfiguration(
+                [APP_PATH . '/Models'], $app['config']['debug']
+            );
         };
 
-        $app['db'] = function ($app) {
 
-            return new \Spot\Locator($app['db.config']);
+        $app['db'] = function ($app) use ($config) {
+
+            $params = $config['connections'][$config['default']];
+
+            return EntityManager::create($params, $app['db.config']);
         };
     }
 }

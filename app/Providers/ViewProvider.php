@@ -26,7 +26,6 @@ class ViewProvider extends AbstractProvider
 
         $app['view.data'] = new Data;
     
-
         $app['view'] = function ($app) {
 
             $config = $app['config']['view'];

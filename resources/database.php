@@ -11,7 +11,7 @@ return [
             'user'     => 'root',
             'password' => '123456',
             'host'     => 'localhost',
-            'driver' => 'pdo_mysql',
+            'driver'   => 'pdo_mysql',
         ]
     ]
 ];

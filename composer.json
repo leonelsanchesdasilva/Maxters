@@ -15,7 +15,7 @@
         "phplegends/routes" : "dev-master",
         "phplegends/http" : "dev-master",
         "pimple/pimple": "^3.0",
-        "doctrine/orm": "^2.5"
+        "vlucas/spot2": "^2.2"
     },
     "autoload" : {
         "psr-4" : {

@@ -80,9 +80,7 @@ class Dispatcher implements Dispatchable
      * */
     protected function resolveControllerInstance($class, $method)
     {
-        $controller = new $class;
-
-        $controller->setApp($this->app);
+        $controller = new $class($this->app);
 
         return [$controller, $method];
     }
@@ -184,9 +182,9 @@ class Dispatcher implements Dispatchable
 
         } else {
 
-            $controller = (new Controller())->setApp($this->app);
+            $controller = new Controller($this->app);
 
-            $action = $action->bindTo($controller, 'Maxters\Controllers\Controller');
+            $action = $action->bindTo($controller, '\Maxters\Controllers\Controller');
         }
 
         return $action;

@@ -11,6 +11,11 @@ class Controller
 {
 	protected $app;
 
+	public function __construct(PimpleContainer $app)
+	{
+		$this->setApp($app);
+	}
+
 	public function setApp(PimpleContainer $app)
 	{
 		$this->app = $app;
@@ -30,18 +35,19 @@ class Controller
 		return $request;
 	}
 
-	public function render($view, $data = [])
-	{
-		return $this->app['view']->create($view, $data);
+	protected function entityMapper($entity = null)
+	{	
+		if ($entity !== null) {
+
+			return $this->app['db']->mapper($entity);
+		}
+
+		return $this->app['db'];
 	}
 
-	/**
-	 *
-	 * @return \Spot\Locator
-	 * */
-	public function db()
+	protected function render($view, $data = [])
 	{
-		return $this->app['db'];
+		return $this->app['view']->create($view, $data);
 	}
 
 }

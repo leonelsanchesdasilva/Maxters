@@ -2,99 +2,29 @@
 
 namespace Maxters\Models;
 
-/**
- * @Table(name="users")
- * @Entity
- * */
-class User
+use Spot\Entity;
+use Spot\EntityInterface;
+use Spot\MapperInterface;
+
+class User extends Entity
 {
-    /**
-     * 
-     * @Column(type="string", length=255)
-     * */
-    protected $name;
+    protected static $table = 'users';
 
-    /**
-     * 
-     * @Column(type="string", length=255, unique=true)
-     * */
-    protected $email;
-
-    /**
-     * @Id
-     * @Column(type="integer")
-     */
-    protected $id = null;
-
-    /**
-     * Gets the value of name.
-     *
-     * @return mixed
-     */
-    public function getName()
+    public static function fields()
     {
-        return $this->name;
+        return [
+            'id'    => ['type' => 'integer', 'autoincrement' => true, 'primary' => true],
+            'name'  => ['type' => 'string', 'required' => true],
+            'email' => ['type' => 'text', 'required' => true],
+        ];
     }
 
-    /**
-     * Sets the value of name.
-     *
-     * @param mixed $name the name
-     *
-     * @return self
-     */
-    public function setName($name)
+    public static function relations(MapperInterface $mapper, EntityInterface $entity)
     {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Gets the value of email.
-     *
-     * @return mixed
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * Sets the value of email.
-     *
-     * @param mixed $email the email
-     *
-     * @return self
-     */
-    public function setEmail($email)
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * Gets the value of id.
-     *
-     * @return mixed
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Sets the value of id.
-     *
-     * @param mixed $id the id
-     *
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
+        return [
+            // 'tags' => $mapper->hasManyThrough($entity, 'Entity\Tag', 'Entity\PostTag', 'tag_id', 'post_id'),
+            // 'comments' => $mapper->hasMany($entity, 'Entity\Post\Comment', 'post_id')->order(['date_created' => 'ASC']),
+            // 'author' => $mapper->belongsTo($entity, 'Entity\Author', 'author_id')
+        ];
     }
 }

@@ -14,9 +14,11 @@ class UsersController extends Controller
 
     public function actionAjaxListGet($offset = 0)
     {
-        $query = $this->app['db']->mapper('Maxters\Models\User');
 
-        return $query->all()->limit(10, $offset * 10);
+        return $this->entityMapper('Maxters\Models\User')
+                    ->all()
+                    ->limit($limit = 10, $offset * $limit)
+                    ->toArray();
     }
 
     public function actionAjaxCreatePost()
@@ -25,7 +27,7 @@ class UsersController extends Controller
 
         $user = new User($data);
 
-        $this->app['db']->mapper(get_class($user))->save($user);
+        $this->entityMapper('Maxters\Models\User')->save($user);
 
         return $user->toArray();
 
@@ -38,7 +40,7 @@ class UsersController extends Controller
      * */
     public function actionAjaxInfoGet($id)
     {
-        $user = $this->app['db']->mapper('Maxters\Models\User')->first(compact('id'));
+        $user = $this->entityMapper('Maxters\Models\User')->first(compact('id'));
 
         \Maxters\http_error_when(!$user, 'User not found', 404);
 

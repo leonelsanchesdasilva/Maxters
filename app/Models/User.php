@@ -15,7 +15,7 @@ class User extends Entity
         return [
             'id'    => ['type' => 'integer', 'autoincrement' => true, 'primary' => true],
             'name'  => ['type' => 'string', 'required' => true],
-            'email' => ['type' => 'text', 'required' => true],
+            'email' => ['type' => 'string', 'required' => true],
         ];
     }
 

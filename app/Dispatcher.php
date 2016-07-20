@@ -3,15 +3,16 @@
 namespace Maxters;
 
 use Maxters\Container;
-use PHPLegends\Http\Request;
 use Maxters\Controllers\Controller;
-use PHPLegends\Routes\Router;
-use PHPLegends\Http\Response;
-use PHPLegends\Routes\Collection;
-use PHPLegends\Http\JsonResponse;
-use PHPLegends\Routes\Dispatchable;
 use PHPLegends\Http\Exceptions\HttpException;
 use PHPLegends\Http\Exceptions\NotFoundException;
+use PHPLegends\Http\JsonResponse;
+use PHPLegends\Http\Request;
+use PHPLegends\Http\Response;
+use PHPLegends\Routes\Collection;
+use PHPLegends\Routes\Dispatchable;
+use PHPLegends\Routes\Router;
+use PHPLegends\Routes\Traits\DispatcherTrait;
 
 /**
  * Dispatcher for Maxters Framework application
@@ -22,6 +23,8 @@ use PHPLegends\Http\Exceptions\NotFoundException;
  * */
 class Dispatcher implements Dispatchable
 {
+
+    use DispatcherTrait;
 
     /**
      * @var \Maxters\Container
@@ -66,7 +69,7 @@ class Dispatcher implements Dispatchable
 
         $action = $this->resolveRouteAction($route);
 
-        $response = call_user_func_array($action, $route->match($uri));
+        $response = call_user_func_array($action, $route->getParameters());
 
         return $this->processRouteResponse($response);
 

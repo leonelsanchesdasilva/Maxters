@@ -7,6 +7,10 @@ use Pimple\Container;
 
 class AppProvider extends AbstractProvider
 {
+	/**
+	 * 
+	 * @var array
+	 * */
 	protected $providers = [
 		'Maxters\Providers\DatabaseProvider',
 		'Maxters\Providers\HttpProvider',
@@ -15,7 +19,6 @@ class AppProvider extends AbstractProvider
 	];
 
 	/**
-	 *
 	 *
 	 * @param Container $app
 	 * @return void
@@ -27,6 +30,10 @@ class AppProvider extends AbstractProvider
 		$this->addProviders($app);
 	}
 
+	/**
+	 * 
+	 * @param Container $app
+	 * */
 	public function addProviders(Container $app)
 	{
 		foreach ($this->providers as $provider)

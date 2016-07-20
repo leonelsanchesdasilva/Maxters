@@ -9,7 +9,7 @@ class UsersController extends Controller
 {
     public function actionIndexGet()
     {
-        return $this->render('users/index', compact('users'));
+        return $this->render('users/index');
     }
 
     public function actionAjaxListGet($offset = 0)

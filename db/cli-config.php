@@ -6,6 +6,4 @@ use Doctrine\ORM\Tools\Console\ConsoleRunner;
 
 require_once __DIR__ . '/../boot/start.php';
 
-//new ClassLoader('CustomLib', '/path/to/custom/lib')
-
 return ConsoleRunner::createHelperSet($app['db']);

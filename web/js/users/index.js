@@ -1,5 +1,7 @@
 app.controller('users.index', function ($scope, $http) {
 
+    $scope.users = [];
+
     (function _ajax() {
 
         _ajax.page = typeof(_ajax.page) === 'undefined' ? 0 : ++_ajax.page;
@@ -8,16 +10,15 @@ app.controller('users.index', function ($scope, $http) {
 
             if (! response.data.length) return;
 
-            $scope.users = response.data;
+            $scope.users = $scope.users.concat(response.data);
 
-            setTimeout(_ajax, 1000);
+            setTimeout(_ajax, 400);
 
         });
 
     })();
 
     $scope.create = function(user) {
-
         $http.post(
             '/users/ajax-create',
             user

@@ -72,4 +72,9 @@ class DebugController extends Controller
     {
         return ['accept' => $this->request()->getHeaders()->getLine('Content-Type')];
     }
+
+    public function actionAjaxPostPost()
+    {
+        return ['method' => $this->request()->getMethod()];
+    }
 }

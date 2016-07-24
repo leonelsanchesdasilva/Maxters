@@ -9,7 +9,7 @@
             "email": "wallacemaxters@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability" : "dev",
     "require": {
         "phplegends/view" : "dev-master",
         "phplegends/routes" : "dev-master",

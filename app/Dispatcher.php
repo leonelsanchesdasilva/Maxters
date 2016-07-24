@@ -2,11 +2,11 @@
 
 namespace Maxters;
 
-use Maxters\Container;
 use PHPLegends\Http\Request;
 use PHPLegends\Routes\Route;
 use PHPLegends\Http\Response;
 use PHPLegends\Routes\Router;
+use Maxters\Providers\Container;
 use PHPLegends\Http\JsonResponse;
 use Maxters\Controllers\Controller;
 use PHPLegends\Routes\Dispatchable;
@@ -148,6 +148,8 @@ class Dispatcher implements Dispatchable
         }
 
         $this->mergeCookiesAndHeaders($response, $this->app['headers']);
+
+        $response->withSession($this->app['session']);
 
         $response->send(true);
 

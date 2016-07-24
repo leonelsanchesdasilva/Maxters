@@ -2,7 +2,7 @@
 
 namespace Maxters\Exceptions;
 
-use Maxters\Container;
+use Maxters\Providers\Container;
 use PHPLegends\Http\Response;
 use PHPLegends\Http\Exceptions\NotFoundException;
 use PHPLegends\Http\Exceptions\HttpExceptionInterface;

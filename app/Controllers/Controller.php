@@ -50,4 +50,19 @@ class Controller
 		return $this->app['view']->create($view, $data);
 	}
 
+	public function session($data = null)
+	{	
+		if (is_string($data)) {
+
+			return $this->app['session'][$data];
+
+		} elseif (is_array($data)) {
+
+			return $this->app['session']->getStorage()->merge($data);
+		}
+
+		return $this->app['session'];
+
+	}
+
 }

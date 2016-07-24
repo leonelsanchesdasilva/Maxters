@@ -3,3 +3,4 @@ composer.lock
 Maxters.sublime-project
 Maxters.sublime-workspace
 .phpintel
+/src

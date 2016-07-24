@@ -58,3 +58,22 @@ $router->get('redirect', function () {
     );
 
 })->setName('redirect_to.home');
+
+
+
+$router->get('sessions', function ()
+{
+
+    //print_r($this->session());
+
+    if (! $this->session()->has('name')) {
+
+        $this->session(['name' => 'wallace']);
+
+        return 'New name has inserted';
+    }
+
+
+
+    return 'Session ok!';   
+});

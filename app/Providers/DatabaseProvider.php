@@ -2,14 +2,9 @@
 
 namespace Maxters\Providers;
 
-use Pimple\Container;
-use Doctrine\ORM\Tools\Setup;
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\ClassLoader;
-
 class DatabaseProvider extends AbstractProvider
 {
-    public function register(Container $app)
+    public function register(\Pimple\Container $app)
     {
 
         $app['db.params'] = include RESOURCES_PATH . '/database.php';

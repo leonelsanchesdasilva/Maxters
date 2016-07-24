@@ -9,5 +9,7 @@ return [
             'tpl'   => (unset) 'DefineYourCompile'
         ],
 		'paths'     => []
-	]
+	],
+
+    'charset' => 'UTF-8'
 ];

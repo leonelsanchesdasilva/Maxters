@@ -2,7 +2,6 @@
 
 namespace Maxters\Providers;
 
-use Pimple\Container;
 use PHPLegends\View\Factory;
 use PHPLegends\View\Finder;
 use PHPLegends\View\Data;
@@ -15,7 +14,7 @@ class ViewProvider extends AbstractProvider
      * @param Container $app
      * @return void
      * */
-    public function register(Container $app)
+    public function register(\Pimple\Container $app)
     {
         $app['view.finder'] = function ($app) {
 

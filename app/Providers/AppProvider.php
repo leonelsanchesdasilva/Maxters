@@ -3,7 +3,6 @@
 namespace Maxters\Providers;
 
 use PHPLegends\Http\Response;
-use Pimple\Container;
 
 class AppProvider extends AbstractProvider
 {
@@ -16,6 +15,7 @@ class AppProvider extends AbstractProvider
 		'Maxters\Providers\HttpProvider',
 		'Maxters\Providers\RouterProvider',
 		'Maxters\Providers\ViewProvider',
+		'Maxters\Providers\SessionProvider',
 	];
 
 	/**
@@ -23,7 +23,7 @@ class AppProvider extends AbstractProvider
 	 * @param Container $app
 	 * @return void
 	 * */
-	public function register(Container $app)
+	public function register(\Pimple\Container $app)
 	{
 		$this->registryConfiguration($app);
 
@@ -54,7 +54,6 @@ class AppProvider extends AbstractProvider
 		}
 
 		$app['config'] = include_once $configFile;
-
 	}
 
 }

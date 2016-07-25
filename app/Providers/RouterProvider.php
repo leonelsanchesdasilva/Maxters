@@ -36,6 +36,9 @@ class RouterProvider extends AbstractProvider
 
     public function mapDebug(Router $router)
     {
-        include_once APP_PATH . '/routes.debug.php';    
+        $router->group(['prefix' => '_debug/'], function ($router) {
+
+            include_once APP_PATH . '/routes.debug.php';    
+        });
     }
 }

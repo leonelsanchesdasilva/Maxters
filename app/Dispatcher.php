@@ -87,12 +87,18 @@ class Dispatcher implements Dispatchable
 
         if ($action instanceof \Closure) {
 
-            $controller = new Controller($this->app);
+            $controller = (new Controller())->setApp($this->app);
 
             return $action->bindTo($controller, get_class($controller));
         }
 
-        return [new $action[0]($this->app), $action[1]];
+        list ($class, $method) = $action;
+
+        $class = new $class;
+
+        $class->setApp($this->app);
+
+        return [$class, $method];
     }
 
     /**

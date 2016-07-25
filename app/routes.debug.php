@@ -11,7 +11,7 @@ $router->group(['namespace' => 'Maxters\Controllers'], function ($router)
 // Cookies test
 
 
-$router->get('/cookie', function () {
+$router->get('cookie', function () {
 
     $this->app['cookies']->set('name', 'Wallace');
 
@@ -61,10 +61,7 @@ $router->get('redirect', function () {
 
 
 
-$router->get('sessions', function ()
-{
-
-    //print_r($this->session());
+$router->get('sessions', function () {
 
     if (! $this->session()->has('name')) {
 
@@ -73,7 +70,13 @@ $router->get('sessions', function ()
         return 'New name has inserted';
     }
 
+    return $this->session()->getId();   
+});
 
 
-    return 'Session ok!';   
+$router->get('flash', function () {
+
+    $this->session()->setFlash('message', 'Testando flash!');
+
+    return new RedirectResponse('/');
 });

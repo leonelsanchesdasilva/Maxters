@@ -5,8 +5,7 @@ use PHPLegends\Http\RedirectResponse;
 use PHPLegends\Http\JsonResponse;
 
 $router->get('/', 'Maxters\Controllers\Home::index')
-        ->setName('home')
-        ->addFilter('age');
+        ->setName('home');
 
 $router->group(['namespace' => 'Maxters\Controllers'], function ($router)
 {

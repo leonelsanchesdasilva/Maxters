@@ -13,14 +13,18 @@
 </head>
 <body>
 	<div class="container">
+
 		<div>
 		  <h1 class="page-title"><?= $this->getSection('title', 'Maxters Framework') ?></h1>
-          <div class="pull-right">
-              <a href="<?= $app['request']->getHeaders()->getLine('referer') ?>">
-                  Voltar
-              </a>
-          </div>
+        <div class="pull-right">
+            <a href="<?= $app['request']->getHeaders()->getLine('referer') ?>">
+                Voltar
+            </a>
         </div>
+    </div>
+    <?php if ($app['session']->hasFlash('message')): ?>
+      <div class='alert alert-danger'><?= $app['session']->getFlash('message') ?></div>
+    <?php endif ?>
 		<div ng-app="content"><?= $this->getSection('content') ?>
 	</div>
 </body>

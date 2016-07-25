@@ -24,11 +24,7 @@ class SessionProvider extends AbstractProvider
 
             $session = new Session($app['session.handler']);
 
-            $session->setLifeTime($app['session.lifetime']);
-
             return $session;
         };
-
-        $app['session.lifetime'] = '+10 minutes';
     }
 }

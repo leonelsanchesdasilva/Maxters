@@ -11,11 +11,6 @@ class Controller
 {
 	protected $app;
 
-	public function __construct(PimpleContainer $app)
-	{
-		$this->setApp($app);
-	}
-
 	public function setApp(PimpleContainer $app)
 	{
 		$this->app = $app;
